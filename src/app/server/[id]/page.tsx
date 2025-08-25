@@ -1,6 +1,5 @@
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
-import { Button } from "@/components/ui/button";
 
 export default async function Server(params: {params: Promise<{ id: string }>}) {
   const { id } = await params.params;

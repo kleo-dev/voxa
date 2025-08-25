@@ -7,8 +7,11 @@ function Message() {
       <div className="flex gap-2">
         <div className="w-8 h-8 rounded-full bg-gray-400" />
         <div className="flex flex-col">
-          <span className="font-bold">User</span>
-          <span className="text-sm text-gray-500">
+          <span className="font-bold flex gap-1 items-center">
+            User <p className="text-neutral-500 text-xs">26/8/25, 12:45 AM</p>
+          </span>
+
+          <span className="text-sm text-muted-foreground">
             Hello, this is a message!
           </span>
         </div>
