@@ -22,8 +22,8 @@ function Message() {
 
 export default function MessageBox() {
   return (
-    <div className="h-screen w-full flex flex-col p-5">
-      <div className="w-full flex-1 overflow-y-scroll flex flex-col gap-2">
+    <div className="h-screen w-full flex flex-col p-5 gap-5">
+      <div className="w-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse">
         {Array.from({ length: 50 }).map((_, i) => (
           <Message key={i} />
         ))}
