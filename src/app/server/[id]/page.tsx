@@ -1,3 +1,4 @@
+import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +16,8 @@ export default async function Server(params: {params: Promise<{ id: string }>}) 
         { id: '4', name: 'voice-chat', kind: 'voice' },
       ]
     }}>
-      <Button>Hello {id}</Button>
+      <MessageBox />
+      <MessageBox />
     </AppSidebar>
   );
 }
