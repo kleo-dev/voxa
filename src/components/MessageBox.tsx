@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { SmilePlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -36,7 +36,8 @@ function MessageContainer({ message }: { message: Message }) {
 
           <span className="text-foreground/85 flex flex-col">
             {message.content.split("\n\n").map((line, index) => (
-              <div key={index}>
+              <div key={index} className="h-max">
+                {index > 0 && <br />}
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
@@ -68,7 +69,6 @@ function MessageContainer({ message }: { message: Message }) {
                 >
                   {line}
                 </ReactMarkdown>
-                <br />
               </div>
             ))}
           </span>
