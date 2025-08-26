@@ -1,8 +1,4 @@
-export interface Channel {
-  id: string;
-  name: string;
-  kind: "text" | "voice";
-}
+import Channel from "./channel";
 
 export default interface Server {
   id: string;

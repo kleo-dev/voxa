@@ -1,36 +1,67 @@
+"use client";
+
+import Message from "@/types/message";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import * as emoji from "emoji-picker-react";
+import EmojiPicker from "emoji-picker-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { SmilePlusIcon } from "lucide-react";
+import { useState } from "react";
 
-function Message() {
+function MessageContainer({ message }: { message: Message }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-2">
         <div className="w-8 h-8 rounded-full bg-gray-400" />
         <div className="flex flex-col">
           <span className="font-bold flex gap-1 items-center">
-            User <p className="text-neutral-500 text-xs">26/8/25, 12:45 AM</p>
+            {message.authorId}
+            <p className="text-neutral-500 text-xs">26/8/25, 12:45 AM</p>
           </span>
 
-          <span className="text-sm text-muted-foreground">
-            Hello, this is a message!
-          </span>
+          <span className="text-sm text-foreground/85">{message.content}</span>
         </div>
       </div>
     </div>
   );
 }
 
-export default function MessageBox() {
+export default function MessageBox({ messages }: { messages: Message[] }) {
+  const [text, setText] = useState("");
+
   return (
     <div className="h-screen w-full flex flex-col p-5 gap-5">
       <div className="w-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse">
-        {Array.from({ length: 50 }).map((_, i) => (
-          <Message key={i} />
+        {messages.map((msg) => (
+          <MessageContainer key={msg.id} message={msg} />
         ))}
       </div>
       <div className="w-full flex gap-3">
-        <Input className="" placeholder="Type a message..." />
-        <Button>Send</Button>
+        <Input
+          className=""
+          placeholder="Type a message..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary">
+              <SmilePlusIcon />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="">
+            <EmojiPicker
+              onEmojiClick={(e) => setText(text + e.emoji)}
+              theme={emoji.Theme.DARK}
+            />
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

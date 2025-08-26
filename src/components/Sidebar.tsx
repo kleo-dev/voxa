@@ -15,7 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import Server from "@/types/Server";
+import Server from "@/types/server";
 
 export default function AppSidebar({
   server,
@@ -24,8 +24,8 @@ export default function AppSidebar({
   server?: Server;
   children: React.ReactNode;
 }>) {
-  return (
-    server ? <SidebarProvider defaultOpen>
+  return server ? (
+    <SidebarProvider defaultOpen>
       <Sidebar>
         <SidebarHeader>
           <SidebarMenu>
@@ -53,14 +53,15 @@ export default function AppSidebar({
         <SidebarContent className="px-2">
           {server.channels.map((channel) => (
             <SidebarMenuButton key={channel.id} className="gap-1.5">
-              {channel.kind === 'voice' ? <MicIcon /> : <HashIcon />}
+              {channel.kind === "voice" ? <MicIcon /> : <HashIcon />}
               {channel.name}
             </SidebarMenuButton>
           ))}
         </SidebarContent>
       </Sidebar>
       {children}
-    </SidebarProvider> :
+    </SidebarProvider>
+  ) : (
     children
   );
 }
