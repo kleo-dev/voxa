@@ -12,6 +12,7 @@ import {
 } from "./ui/dropdown-menu";
 import { SmilePlusIcon } from "lucide-react";
 import { useState } from "react";
+import { format, isToday, isYesterday } from "date-fns";
 
 function MessageContainer({ message }: { message: Message }) {
   return (
@@ -21,7 +22,14 @@ function MessageContainer({ message }: { message: Message }) {
         <div className="flex flex-col">
           <span className="font-bold flex gap-1 items-center">
             {message.authorId}
-            <p className="text-neutral-500 text-xs">26/8/25, 12:45 AM</p>
+
+            <p className="text-neutral-500 text-xs">
+              {isToday(message.timestamp)
+                ? format(message.timestamp, "p")
+                : isYesterday(message.timestamp)
+                ? "Yesterday, " + format(message.timestamp, "p")
+                : format(message.timestamp, "PP, p")}
+            </p>
           </span>
 
           <span className="text-sm text-foreground/85">{message.content}</span>
