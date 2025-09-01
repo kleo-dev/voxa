@@ -65,6 +65,14 @@ function MessageContainer({ message }: { message: Message }) {
                         {...props}
                       />
                     ),
+                    a: ({ node, ...props }) => (
+                      <a
+                        className="text-accent-foreground underline underline-offset-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        {...props}
+                      />
+                    ),
                   }}
                 >
                   {line}
