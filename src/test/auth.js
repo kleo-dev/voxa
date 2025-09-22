@@ -1,11 +1,12 @@
 import axios from "axios";
 
-// Create a temp token
-axios.post('http://localhost:3000/api/auth', {
+const res = (await axios.post('http://localhost:3000/api/auth', {
     intents: 'server',
     server_ip: 'localhost'
-}).then((r) => {
-    console.log(r.data);
-}).catch((e) => {
-    console.log(e);
-});
+})).data;
+
+const token = res.token;
+
+const output = (await axios.get('http://localhost:3000/api/auth?intents=server&token='+token)).data;
+
+console.log(output);
