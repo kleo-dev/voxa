@@ -24,6 +24,12 @@ export async function GET(req: NextRequest) {
         
         if (!auth)
           return NextResponse.json({ message: "Invalid token" });
+
+        const ip = (req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",")[0] || '127.0.0.1').replace('::1', '127.0.0.1');
+
+        if (auth.server_ip !== ip) {
+          return NextResponse.json({ message: "Invalid address" });
+        }
         
         delete SERVER_AUTH_TOKENS[token];
 

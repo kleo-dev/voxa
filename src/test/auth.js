@@ -2,7 +2,7 @@ import axios from "axios";
 
 const res = (await axios.post('http://localhost:3000/api/auth', {
     intents: 'server',
-    server_ip: 'localhost'
+    server_ip: '127.0.0.1'
 })).data;
 
 const token = res.token;
