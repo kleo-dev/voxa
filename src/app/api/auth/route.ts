@@ -4,6 +4,7 @@ import {
 } from 'http-status-codes';
 import { narrow } from "@/types/typeUtils";
 import { CLIENT_AUTH_TOKENS, SERVER_AUTH_TOKENS } from "./auth";
+import { initDb } from "../db";
 
 type Intents = 'server' | 'client';
 
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
   switch (narrowIntents(intents[0])) {
     case 'server':
       SERVER_AUTH_TOKENS[token] = {
-        user_id, // placeholder
+        user_id,
         server_ip: String(server_ip),
       };
       return NextResponse.json({ message: "ok", token });
@@ -68,3 +69,5 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid intentions' }, { status: StatusCodes.BAD_REQUEST });
   }
 }
+
+initDb();

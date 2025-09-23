@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "echo 'Run a specific test with npm test:<test>'",
     "test:auth": "node src/test/auth.js",
-    "test": "echo 'Run a specific test with npm test:<test>'"
+    "test:user": "node src/test/user.js"
   },
   "dependencies": {
     "@lexical/react": "^0.34.0",
@@ -30,6 +31,7 @@
     "lexical": "^0.34.0",
     "lucide-react": "^0.541.0",
     "next": "15.5.0",
+    "pg": "^8.16.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
@@ -39,6 +41,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.11",
+    "@types/pg": "^8.15.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
