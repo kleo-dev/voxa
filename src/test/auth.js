@@ -1,16 +1,19 @@
 import axios from "axios";
 import { getUser } from "./user.js";
 
-const session_token = await getUser();
+export async function auth(session_token, server_ip) {
+    const res = (await axios.post('http://localhost:3000/api/auth', {
+        server_ip,
+        session_token,
+    })).data;
 
-const res = (await axios.post('http://localhost:3000/api/auth', {
-    intents: 'server',
-    server_ip: '127.0.0.1',
-    session_token,
-})).data;
+    return res.token;
+}
 
-const token = res.token;
+// const session_token = await getUser();
 
-const output = (await axios.get('http://localhost:3000/api/auth?intents=server&token='+token)).data;
+// const token = await auth(session_token);
 
-console.log(output);
+// const output = (await axios.get('http://localhost:3000/api/auth?intents=server&token='+token)).data;
+
+// console.log(output);

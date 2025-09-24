@@ -23,19 +23,19 @@ function MessageContainer({ message }: { message: Message }) {
         <div className="w-8 h-8 rounded-full bg-gray-400" />
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
-            {message.authorId}
+            {message.from}
 
             <p className="text-neutral-500 text-xs">
-              {isToday(message.timestamp)
-                ? format(message.timestamp, "p")
-                : isYesterday(message.timestamp)
-                ? "Yesterday, " + format(message.timestamp, "p")
-                : format(message.timestamp, "PP, p")}
+              {isToday(message.timestamp * 1000)
+                ? format(message.timestamp * 1000, "p")
+                : isYesterday(message.timestamp * 1000)
+                ? "Yesterday, " + format(message.timestamp * 1000, "p")
+                : format(message.timestamp * 1000, "PP, p")}
             </p>
           </span>
 
           <span className="text-foreground/85 flex flex-col">
-            {message.content.split("\n\n").map((line, index) => (
+            {message.contents.split("\n\n").map((line, index) => (
               <div key={index} className="h-max">
                 {index > 0 && <br />}
                 <ReactMarkdown
@@ -86,7 +86,7 @@ function MessageContainer({ message }: { message: Message }) {
   );
 }
 
-export default function MessageBox({ messages }: { messages: Message[] }) {
+export default function MessageBox({ messages, sendMessage }: { messages: Message[], sendMessage: (m: string) => void }) {
   const [text, setText] = useState("");
 
   return (
@@ -102,6 +102,12 @@ export default function MessageBox({ messages }: { messages: Message[] }) {
           placeholder="Type a message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              sendMessage(text);
+              setText('');
+            }
+          }}
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -1,7 +1,7 @@
 export default interface Message {
-  id: string;
-  content: string;
-  authorId: string;
-  channelId: string;
-  timestamp: Date;
+  id: number;
+  channel_id: string;
+  from: number;
+  contents: string;
+  timestamp: number;
 }

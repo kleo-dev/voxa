@@ -1,10 +1,65 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
+import { getUser } from '@/test/user';
+import { auth } from '@/test/auth';
+import Message from "@/types/message";
 
-export default async function Server(params: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params.params;
+export default function Server() {
+  const { id } = useParams<{ id: string }>();
+  const wsRef = useRef<WebSocket | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    getUser().then(session_token => {
+      auth(session_token, id === 'localhost' ? '127.0.0.1' : id).then(server_auth => {
+        // Open the WebSocket connection
+        const ws = new WebSocket(`ws://${id}:7080`);
+        wsRef.current = ws;
+    
+        ws.onopen = () => {
+          console.log("Connected to WebSocket:", id);
+          ws.send(JSON.stringify({
+            version: '0.0.1',
+            auth_token: server_auth,
+            last_message: 0
+          }))
+        };
+    
+        ws.onmessage = (m) => {
+          const data = JSON.parse(m.data);
+          console.log("Message received:", data);
+
+          switch (data.type) {
+            case 'authenticated':
+              setMessages(data.params.messages);
+            
+            case 'message_create':
+              // setMessages([...messages, data.params]);
+              setMessages((prev) => [...prev, data.params]);
+          }
+        };
+    
+        ws.onerror = (err) => {
+          console.error("WebSocket error:", err);
+        };
+    
+        ws.onclose = () => {
+          console.log("WebSocket closed:", id);
+        };
+    
+        // Cleanup on unmount or id change
+        return () => {
+          ws.close();
+        };
+      });
+    })
+  }, [id]);
 
   return (
     <AppSidebar
@@ -20,16 +75,18 @@ export default async function Server(params: {
       }}
     >
       <MessageBox
-        messages={[
-          {
-            id: "1",
-            authorId: "user1",
-            content:
-              "# Test\n### Hello World\n\nThis is a **markdown** message with _various_ elements:\n\n- Item 1\n- Item 2\n- Item 3\n\n[Click here](https://example.com) for more info.\n\n1. First\n2. Second\n3. Third",
-            channelId: "1",
-            timestamp: new Date(),
-          },
-        ]}
+        messages={messages.filter(m => m.channel_id === 'general').toReversed()}
+        sendMessage={(message) => {
+          wsRef.current?.send(JSON.stringify(
+            {
+              type: 'send_message',
+              params: {
+                channel_id: 'general',
+                contents: message
+              }
+          }
+          ));
+        }}
       />
     </AppSidebar>
   );
