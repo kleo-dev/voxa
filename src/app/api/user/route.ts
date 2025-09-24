@@ -1,20 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "../db";
+import pool, { initDb } from "../db";
 import { StatusCodes } from "http-status-codes";
 import { CLIENT_AUTH_TOKENS } from "../auth/auth";
 
-/*
-Input:
-    {
-        "name": "<Bob Smith>",
-        "password": "<bobsmith21>"
-    }
-Output:
-    {
-        "message": "ok",
-        "token": "<crypto-uuid>",
-    }
-*/
 export async function POST(req: NextRequest) {
   let { name, username, email, password } = await req.json();
 
@@ -40,7 +28,7 @@ export async function POST(req: NextRequest) {
   const result = await pool.query("INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id;", [username, email, password]);
   const token = crypto.randomUUID();
 
-  CLIENT_AUTH_TOKENS[token] = result.rows[0].id;
+  CLIENT_AUTH_TOKENS[token] = parseInt(result.rows[0].id);
 
   return NextResponse.json({ message: "ok", token, user_id: result.rows[0].id });
 }
@@ -55,3 +43,5 @@ export async function DELETE(req: NextRequest) {
 
   return NextResponse.json({ message: "ok" });
 }
+
+initDb();
