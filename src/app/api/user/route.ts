@@ -33,14 +33,36 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ message: "ok", token, user_id: result.rows[0].id });
 }
 
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  let query_id = url.searchParams.get("id");
+  const token = url.searchParams.get("token");
+
+  if (!query_id && !token)
+    return NextResponse.json({ message: "Query arg should be token or id" }, { status: StatusCodes.BAD_REQUEST });
+  else {
+    const id = query_id ? query_id : token ? CLIENT_AUTH_TOKENS[token] : null;
+
+    if (!id)
+      return NextResponse.json({ message: "Invalid token" }, { status: StatusCodes.NOT_FOUND });
+
+    const user = await pool.query(
+      "SELECT id, username, email FROM users WHERE id = $1;",
+      [id]
+    );
+
+    return NextResponse.json({ message: "ok", ...user.rows[0] });
+  }
+}
+
 export async function DELETE(req: NextRequest) {
   let { username } = await req.json();
-
+  
   await pool.query(
     "DELETE FROM users WHERE username = $1;",
     [username]
   );
-
+  
   return NextResponse.json({ message: "ok" });
 }
 

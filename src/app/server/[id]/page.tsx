@@ -4,62 +4,69 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
-import { getUser } from '@/test/user';
-import { auth } from '@/test/auth';
 import Message from "@/types/message";
+import getUser from "@/hooks/get-user";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 export default function Server() {
-  const { id } = useParams<{ id: string }>();
+  const { id: ip } = useParams<{ id: string }>();
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const user = getUser();
 
   useEffect(() => {
-    if (!id) return;
+    if (!ip || !user) return;
 
-    getUser().then(session_token => {
-      auth(session_token, id === 'localhost' ? '127.0.0.1' : id).then(server_auth => {
-        // Open the WebSocket connection
-        const ws = new WebSocket(`ws://${id}:7080`);
-        wsRef.current = ws;
-    
-        ws.onopen = () => {
-          console.log("Connected to WebSocket:", id);
-          ws.send(JSON.stringify({
-            version: '0.0.1',
-            auth_token: server_auth,
-            last_message: 0
-          }))
-        };
-    
-        ws.onmessage = (m) => {
-          const data = JSON.parse(m.data);
-          console.log("Message received:", data);
+    async function auth() {
+      const server_auth = ((await axios.post('http://localhost:3000/api/auth', {
+          server_ip: ip === 'localhost' ? '127.0.0.1' : ip,
+          session_token: Cookies.get('token'),
+      })).data as any).token;
 
-          switch (data.type) {
-            case 'authenticated':
-              setMessages(data.params.messages);
-            
-            case 'message_create':
-              // setMessages([...messages, data.params]);
-              setMessages((prev) => [...prev, data.params]);
-          }
-        };
-    
-        ws.onerror = (err) => {
-          console.error("WebSocket error:", err);
-        };
-    
-        ws.onclose = () => {
-          console.log("WebSocket closed:", id);
-        };
-    
-        // Cleanup on unmount or id change
-        return () => {
-          ws.close();
-        };
-      });
-    })
-  }, [id]);
+      // Open the WebSocket connection
+      const ws = new WebSocket(`ws://${ip}:7080`);
+      wsRef.current = ws;
+  
+      ws.onopen = () => {
+        console.log("Connected to WebSocket:", ip);
+        ws.send(JSON.stringify({
+          version: '0.0.1',
+          auth_token: server_auth,
+          last_message: 0
+        }))
+      };
+  
+      ws.onmessage = (m) => {
+        const data = JSON.parse(m.data);
+        console.log("Message received:", data);
+
+        switch (data.type) {
+          case 'authenticated':
+            setMessages(data.params.messages);
+          
+          case 'message_create':
+            // setMessages([...messages, data.params]);
+            setMessages((prev) => [...prev, data.params]);
+        }
+      };
+  
+      ws.onerror = (err) => {
+        console.error("WebSocket error:", err);
+      };
+  
+      ws.onclose = () => {
+        console.log("WebSocket closed:", ip);
+      };
+  
+      // Cleanup on unmount or id change
+      return () => {
+        ws.close();
+      };
+    }
+
+    auth();
+  }, [ip]);
 
   return (
     <AppSidebar
