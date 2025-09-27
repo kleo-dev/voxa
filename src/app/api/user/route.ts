@@ -76,7 +76,7 @@ export async function PUT(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   let query_id = url.searchParams.get("id");
-  const token = url.searchParams.get("token");
+  const token = req.cookies.get("token")?.value;
 
   if (!query_id && !token)
     return NextResponse.json(

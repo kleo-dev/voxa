@@ -23,10 +23,7 @@ export default function Server() {
     async function auth() {
       const server_auth = (
         (
-          await axios.post("/api/auth", {
-            server_ip: ip,
-            session_token: Cookies.get("token"),
-          })
+          await axios.post("/api/auth", { server_ip: ip })
         ).data as any
       ).token;
 

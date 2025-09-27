@@ -40,7 +40,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  let { server_ip, session_token } = await req.json();
+  let { server_ip } = await req.json();
+  const session_token = req.cookies.get("token")?.value;
+
+  if (!session_token)
+    return NextResponse.json(
+      { message: "Token cookie not found" },
+      { status: StatusCodes.UNAUTHORIZED }
+    );
 
   const token = crypto.randomUUID();
 

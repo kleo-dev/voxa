@@ -11,6 +11,12 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const login = async () => {
+    const res = await axios.put("/api/user", { username, password });
+    Cookies.set("token", (res.data as any).token);
+    redirect("/");
+  };
+
   return (
     <div className="h-screen flex items-center">
       <div className="w-md mx-auto p-7 rounded-2xl flex flex-col gap-4 bg-neutral-900">
@@ -21,17 +27,15 @@ export default function Login() {
         </span>
         <span>
           Password
-          <Input onChange={(e) => setPassword(e.target.value)} />
+          <Input
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") login();
+            }}
+          />
         </span>
 
-        <Button
-          className="mt-4"
-          onClick={async () => {
-            const res = await axios.put("/api/user", { username, password });
-            Cookies.set("token", (res.data as any).token);
-            redirect("/");
-          }}
-        >
+        <Button className="mt-4" onClick={login}>
           Login
         </Button>
       </div>
