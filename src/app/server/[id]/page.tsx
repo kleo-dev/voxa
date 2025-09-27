@@ -23,8 +23,8 @@ export default function Server() {
     async function auth() {
       const server_auth = (
         (
-          await axios.post("http://localhost:3000/api/auth", {
-            server_ip: ip === "localhost" ? "127.0.0.1" : ip,
+          await axios.post("/api/auth", {
+            server_ip: ip,
             session_token: Cookies.get("token"),
           })
         ).data as any

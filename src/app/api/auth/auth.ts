@@ -1,8 +1,8 @@
 import { StringMap } from "@/types/typeUtils";
 
 type ServerAuth = {
-    server_ip: string;
-    user_id: number;
+  server_ip: string;
+  user_id: number;
 };
 
 // { token: userid }

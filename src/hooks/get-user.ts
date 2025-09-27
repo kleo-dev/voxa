@@ -26,7 +26,7 @@ export default function useUser() {
 
       try {
         const res = (
-          await axios.get("http://localhost:3000/api/user", {
+          await axios.get("/api/user", {
             params: { token },
           })
         ).data as User;
