@@ -15,15 +15,25 @@ import { useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { StringMap } from "@/types/typeUtils";
+import { User } from "@/hooks/get-user";
 
-function MessageContainer({ message }: { message: Message }) {
+function MessageContainer({
+  message,
+  userList,
+}: {
+  message: Message;
+  userList: StringMap<User>;
+}) {
   return (
     <div className="flex flex-col gap-3 rounded-lg p-4 hover:bg-accent">
       <div className="flex gap-2">
         <div className="w-8 h-8 rounded-full bg-gray-400" />
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
-            {message.from}
+            {userList[message.from]
+              ? userList[message.from].username
+              : message.from}
 
             <p className="text-neutral-500 text-xs">
               {isToday(message.timestamp * 1000)
@@ -86,14 +96,22 @@ function MessageContainer({ message }: { message: Message }) {
   );
 }
 
-export default function MessageBox({ messages, sendMessage }: { messages: Message[], sendMessage: (m: string) => void }) {
+export default function MessageBox({
+  messages,
+  userList,
+  sendMessage,
+}: {
+  messages: Message[];
+  userList: StringMap<User>;
+  sendMessage: (m: string) => void;
+}) {
   const [text, setText] = useState("");
 
   return (
     <div className="h-screen w-full flex flex-col py-5 pl-5 gap-5">
       <div className="w-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse pr-5">
         {messages.map((msg) => (
-          <MessageContainer key={msg.id} message={msg} />
+          <MessageContainer key={msg.id} message={msg} userList={userList} />
         ))}
       </div>
       <div className="w-full flex gap-3 pr-5">
@@ -105,7 +123,7 @@ export default function MessageBox({ messages, sendMessage }: { messages: Messag
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               sendMessage(text);
-              setText('');
+              setText("");
             }
           }}
         />
