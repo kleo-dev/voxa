@@ -9,9 +9,11 @@ import useUser, { User } from "@/hooks/get-user";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { StringMap } from "@/types/typeUtils";
+import ServerType from "@/types/server";
 
 export default function Server() {
   const { id: ip } = useParams<{ id: string }>();
+  const [server, setServer] = useState<undefined | ServerType>();
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const { user, loading } = useUser();
@@ -22,9 +24,7 @@ export default function Server() {
 
     async function auth() {
       const server_auth = (
-        (
-          await axios.post("/api/auth", { server_ip: ip })
-        ).data as any
+        (await axios.post("/api/auth", { server_ip: ip })).data as any
       ).token;
 
       // Open the WebSocket connection
@@ -45,6 +45,11 @@ export default function Server() {
       ws.onmessage = (m) => {
         const data = JSON.parse(m.data);
         console.log("Message received:", data);
+
+        if (data.version) {
+          setServer(data);
+          return;
+        }
 
         switch (data.type) {
           case "authenticated":
@@ -78,18 +83,7 @@ export default function Server() {
   }, [ip, user, loading]);
 
   return (
-    <AppSidebar
-      server={{
-        id: "bro",
-        name: "Bro",
-        channels: [
-          { id: "1", name: "general", kind: "text" },
-          { id: "2", name: "random", kind: "text" },
-          { id: "3", name: "help", kind: "text" },
-          { id: "4", name: "voice-chat", kind: "voice" },
-        ],
-      }}
-    >
+    <AppSidebar server={{ channels: [], ...server } as ServerType}>
       <MessageBox
         userList={userList}
         messages={messages
