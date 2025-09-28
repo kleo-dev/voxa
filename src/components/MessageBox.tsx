@@ -44,40 +44,58 @@ function MessageContainer({
             </p>
           </span>
 
-          <span className="text-foreground/85 flex flex-col">
+          <div className="text-foreground/85 flex flex-col break-words whitespace-pre-wrap">
             {message.contents.split("\n\n").map((line, index) => (
-              <div key={index} className="h-max">
+              <div key={index} className="h-max break-words">
                 {index > 0 && <br />}
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
                     h1: ({ node, ...props }) => (
-                      <h1 className="text-3xl font-bold my-2" {...props} />
+                      <h1
+                        className="text-3xl font-bold my-2 break-words"
+                        {...props}
+                      />
                     ),
                     h2: ({ node, ...props }) => (
-                      <h2 className="text-2xl font-bold my-2" {...props} />
+                      <h2
+                        className="text-2xl font-bold my-2 break-words"
+                        {...props}
+                      />
                     ),
                     h3: ({ node, ...props }) => (
-                      <h3 className="text-xl font-bold my-2" {...props} />
+                      <h3
+                        className="text-xl font-bold my-2 break-words"
+                        {...props}
+                      />
                     ),
                     h4: ({ node, ...props }) => (
-                      <h4 className="text-lg font-bold my-2" {...props} />
+                      <h4
+                        className="text-lg font-bold my-2 break-words"
+                        {...props}
+                      />
                     ),
                     h5: ({ node, ...props }) => (
-                      <h5 className="text-base font-bold my-2" {...props} />
+                      <h5
+                        className="text-base font-bold my-2 break-words"
+                        {...props}
+                      />
                     ),
                     ul: ({ node, ...props }) => (
-                      <ul className="list-disc list-inside my-2" {...props} />
+                      <ul
+                        className="list-disc list-inside my-2 break-words"
+                        {...props}
+                      />
                     ),
                     ol: ({ node, ...props }) => (
                       <ol
-                        className="list-decimal list-inside my-2"
+                        className="list-decimal list-inside my-2 break-words"
                         {...props}
                       />
                     ),
                     a: ({ node, ...props }) => (
                       <a
-                        className="text-accent-foreground underline underline-offset-2"
+                        className="text-accent-foreground underline underline-offset-2 break-all"
                         target="_blank"
                         rel="noopener noreferrer"
                         {...props}
@@ -89,7 +107,7 @@ function MessageContainer({
                 </ReactMarkdown>
               </div>
             ))}
-          </span>
+          </div>
         </div>
       </div>
     </div>
