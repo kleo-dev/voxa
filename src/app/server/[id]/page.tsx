@@ -83,8 +83,16 @@ export default function Server() {
   }, [ip, user, loading]);
 
   return (
-    <AppSidebar server={{ channels: [], ...server } as ServerType}>
+    <AppSidebar
+      server={
+        {
+          channels: [{ id: "general", name: "General", kind: "text" }],
+          ...server,
+        } as ServerType
+      }
+    >
       <MessageBox
+        channelName="General"
         userList={userList}
         setUserList={setUserList}
         messages={messages

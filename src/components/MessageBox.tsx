@@ -131,16 +131,23 @@ export default function MessageBox({
   userList,
   setUserList,
   sendMessage,
+  channelName,
 }: {
   messages: Message[];
   userList: NumberMap<User>;
   setUserList: React.Dispatch<React.SetStateAction<NumberMap<User>>>;
   sendMessage: (m: string) => void;
+  channelName?: string;
 }) {
   const [text, setText] = useState("");
 
   return (
-    <div className="h-screen w-full flex flex-col py-5 pl-5 gap-5">
+    <div className="h-screen w-full flex flex-col pb-5 pl-5 gap-5">
+      {channelName && (
+        <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
+          {channelName}
+        </header>
+      )}
       <div className="w-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse pr-5">
         {messages.map((msg) => (
           <MessageContainer

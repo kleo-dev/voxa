@@ -1,21 +1,12 @@
 "use client";
 
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-} from "./ui/sidebar";
-import { ChevronDown, HashIcon, MicIcon } from "lucide-react";
-import {
-  DropdownMenuItem,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+  HashIcon,
+  MessageCircle,
+  Plus,
+  Search,
+  Volume2Icon,
+} from "lucide-react";
 import Server from "@/types/server";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
@@ -32,7 +23,11 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
-import Link from "next/link";
+import { Card } from "./ui/card";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { ScrollArea } from "./ui/scroll-area";
+import { useRouter } from "next/navigation";
+import Channel from "@/types/channel";
 
 export default function AppSidebar({
   server,
@@ -43,6 +38,7 @@ export default function AppSidebar({
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
+  const router = useRouter();
 
   useEffect(() => {
     const s = Cookies.get("servers")?.split(",");
@@ -63,97 +59,162 @@ export default function AppSidebar({
     setNewServer({ name: "", ip: "" });
   };
 
-  return server ? (
-    <Dialog>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add server</DialogTitle>
-          <DialogDescription>
-            Add a new server to your server list.
-          </DialogDescription>
-        </DialogHeader>
+  return (
+    <div className="flex h-screen">
+      <div className="h-screen flex border-r">
+        <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
+          <Button
+            onClick={() => router.push(`/home`)}
+            className="bg-transparent text-accent-foreground hover:text-accent"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </Button>
 
-        <div className="grid gap-4">
-          <div className="grid gap-3">
-            <Label htmlFor="name-1">Name</Label>
-            <Input
-              id="name-1"
-              name="name"
-              value={newServer.name}
-              onChange={(e) =>
-                setNewServer((prev) => ({ ...prev, name: e.target.value }))
-              }
-              placeholder="Voxa Server"
-            />
-          </div>
-          <div className="grid gap-3">
-            <Label htmlFor="ip-1">Server Ip</Label>
-            <Input
-              id="ip-1"
-              name="ip"
-              value={newServer.ip}
-              onChange={(e) =>
-                setNewServer((prev) => ({ ...prev, ip: e.target.value }))
-              }
-              placeholder="192.168.1.5"
-            />
-          </div>
+          {servers.map(
+            ([ip, name]) =>
+              ip && (
+                <Button
+                  onClick={() => router.push(`/server/${ip}`)}
+                  key={ip}
+                  className="bg-transparent text-accent-foreground hover:text-accent"
+                >
+                  <HashIcon className="h-6 w-6" />
+                </Button>
+              )
+          )}
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Plus className="h-5 w-5" />
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add server</DialogTitle>
+                <DialogDescription>
+                  Add a new server to your server list.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-4">
+                <div className="grid gap-3">
+                  <Label htmlFor="name-1">Name</Label>
+                  <Input
+                    id="name-1"
+                    name="name"
+                    value={newServer.name}
+                    onChange={(e) =>
+                      setNewServer((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
+                    placeholder="Voxa Server"
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <Label htmlFor="ip-1">Server Ip</Label>
+                  <Input
+                    id="ip-1"
+                    name="ip"
+                    value={newServer.ip}
+                    onChange={(e) =>
+                      setNewServer((prev) => ({
+                        ...prev,
+                        ip: e.target.value,
+                      }))
+                    }
+                    placeholder="192.168.1.5"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button type="button" onClick={handleAddServer}>
+                    Add server
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button type="button" onClick={handleAddServer}>
-              Add server
-            </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
+        {/* Right column */}
+        <div className="w-64 flex flex-col bg-card">
+          {server ? (
+            <div className="p-3 border-b flex items-center gap-2">
+              <h2>{server.name}</h2>
+            </div>
+          ) : (
+            <div className="p-3 border-b flex items-center gap-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Find or start a conversation"
+                className="h-8"
+              />
+            </div>
+          )}
+          <ScrollArea className="flex-1">
+            <div className="p-2 flex flex-col gap-2">
+              {server ? (
+                <>
+                  {server.channels.map((channel) => (
+                    <ChannelProp key={channel.id} {...channel} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  <DMItem name="Alice" status="online" />
+                  <DMItem name="Bob" status="offline" />
+                  <DMItem name="Charlie" status="away" />
+                </>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
 
-      <SidebarProvider defaultOpen>
-        <Sidebar>
-          <SidebarHeader>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
-                      {server.name}
-                      <ChevronDown className="ml-auto" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-
-                  <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
-                    {servers.map((s, i) => (
-                      <DropdownMenuItem key={i} asChild>
-                        <Link href={"/server/" + s[0]}>{s[1] || s[0]}</Link>
-                      </DropdownMenuItem>
-                    ))}
-
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem>Add Server</DropdownMenuItem>
-                    </DialogTrigger>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarHeader>
-
-          <SidebarContent className="px-2">
-            {server.channels.map((channel) => (
-              <SidebarMenuButton key={channel.id} className="gap-1.5">
-                {channel.kind === "voice" ? <MicIcon /> : <HashIcon />}
-                {channel.name}
-              </SidebarMenuButton>
-            ))}
-          </SidebarContent>
-        </Sidebar>
-        {children}
-      </SidebarProvider>
-    </Dialog>
-  ) : (
-    children
+      {children}
+    </div>
   );
+}
+
+function DMItem({ name, status }: { name: string; status: string }) {
+  return (
+    <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
+      <Avatar className="h-8 w-8">
+        <AvatarFallback>{name[0]}</AvatarFallback>
+      </Avatar>
+      <div className="flex flex-col">
+        <span className="text-sm font-medium">{name}</span>
+        <span className="text-xs text-muted-foreground">{status}</span>
+      </div>
+    </Card>
+  );
+}
+
+function ChannelProp(channel: Channel) {
+  return (
+    <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
+      <ChannelIcon kind={channel.kind} />
+      <span className="text-sm font-medium">{channel.name}</span>
+    </Card>
+  );
+}
+
+function ChannelIcon({ kind }: { kind: "text" | "voice" }) {
+  switch (kind) {
+    case "text":
+      return <HashIcon className="h-4 w-4" />;
+    case "voice":
+      return <Volume2Icon className="h-4 w-4" />;
+    default:
+      return null;
+  }
 }
