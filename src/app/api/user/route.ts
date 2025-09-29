@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
       { status: StatusCodes.BAD_REQUEST }
     );
   else {
-    const id = query_id ? query_id : token ? CLIENT_AUTH_TOKENS[token] : null;
+    const id = query_id ? parseInt(query_id) : token ? CLIENT_AUTH_TOKENS[token] : null;
 
     if (!id)
       return NextResponse.json(

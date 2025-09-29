@@ -6,6 +6,8 @@ import axios from "axios";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { redirect } from "next/navigation";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -35,7 +37,11 @@ export default function Login() {
           />
         </span>
 
-        <Button className="mt-4" onClick={login}>
+        <Label>
+          Don't have an account? <Link href={"/signup"}>Sign Up</Link>
+        </Label>
+
+        <Button className="mt-2" onClick={login}>
           Login
         </Button>
       </div>

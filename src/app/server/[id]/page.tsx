@@ -8,7 +8,7 @@ import Message from "@/types/message";
 import useUser, { User } from "@/hooks/get-user";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { StringMap } from "@/types/typeUtils";
+import { NumberMap, StringMap } from "@/types/typeUtils";
 import ServerType from "@/types/server";
 
 export default function Server() {
@@ -17,7 +17,7 @@ export default function Server() {
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const { user, loading } = useUser();
-  const [userList, setUserList] = useState<StringMap<User>>({});
+  const [userList, setUserList] = useState<NumberMap<User>>({});
 
   useEffect(() => {
     if (!ip || !user || loading) return;
@@ -86,6 +86,7 @@ export default function Server() {
     <AppSidebar server={{ channels: [], ...server } as ServerType}>
       <MessageBox
         userList={userList}
+        setUserList={setUserList}
         messages={messages
           .filter((m) => m.channel_id === "general")
           .toReversed()}
