@@ -11,20 +11,32 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { SmilePlusIcon } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { StringMap } from "@/types/typeUtils";
+import { NumberMap, StringMap } from "@/types/typeUtils";
 import { User } from "@/hooks/get-user";
+import axios from "axios";
 
 function MessageContainer({
   message,
   userList,
+  setUserList,
 }: {
   message: Message;
-  userList: StringMap<User>;
+  userList: NumberMap<User>;
+  setUserList: React.Dispatch<React.SetStateAction<NumberMap<User>>>;
 }) {
+  useEffect(() => {
+    axios
+      .get("/api/user/", { params: { id: message.from } })
+      .then((res) =>
+        setUserList((prev) => ({ ...prev, [message.from]: res.data as User }))
+      )
+      .catch(console.error);
+  }, [message.from, setUserList]);
+
   return (
     <div className="flex flex-col gap-3 rounded-lg p-4 hover:bg-accent">
       <div className="flex gap-2">
@@ -117,19 +129,33 @@ function MessageContainer({
 export default function MessageBox({
   messages,
   userList,
+  setUserList,
   sendMessage,
+  channelName,
 }: {
   messages: Message[];
-  userList: StringMap<User>;
+  userList: NumberMap<User>;
+  setUserList: React.Dispatch<React.SetStateAction<NumberMap<User>>>;
   sendMessage: (m: string) => void;
+  channelName?: string;
 }) {
   const [text, setText] = useState("");
 
   return (
-    <div className="h-screen w-full flex flex-col py-5 pl-5 gap-5">
+    <div className="h-screen w-full flex flex-col pb-5 pl-5 gap-5">
+      {channelName && (
+        <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
+          {channelName}
+        </header>
+      )}
       <div className="w-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse pr-5">
         {messages.map((msg) => (
-          <MessageContainer key={msg.id} message={msg} userList={userList} />
+          <MessageContainer
+            key={msg.id}
+            message={msg}
+            userList={userList}
+            setUserList={setUserList}
+          />
         ))}
       </div>
       <div className="w-full flex gap-3 pr-5">
