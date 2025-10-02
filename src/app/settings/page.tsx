@@ -1,16 +1,16 @@
 "use client";
 
-import { useClientSettings } from "@/hooks/use-settings";
+import { useAccountSettings, useClientSettings } from "@/hooks/use-settings";
 import { setClientSettings } from "@/lib/clientSettings";
 import Settings from "./settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ACCOUNT_SCHEMA, CLIENT_SCHEMA } from "@/types/settings";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useClientSettings();
+  const [accountSettings, setAccountSettings] = useAccountSettings();
 
   return (
     <Tabs className="mx-auto" defaultValue="client">
@@ -25,13 +25,8 @@ export default function SettingsPage() {
               settings={settings}
               setSettings={setSettings}
               schema={CLIENT_SCHEMA}
+              onSave={() => setClientSettings(settings)}
             />
-            <Button
-              onClick={() => setClientSettings(settings)}
-              variant="outline"
-            >
-              Save
-            </Button>
           </CardContent>
         </Card>
       </TabsContent>
@@ -39,13 +34,11 @@ export default function SettingsPage() {
         <Card className="w-xl mx-auto">
           <CardContent className="flex flex-col gap-3">
             <Settings
-              settings={settings}
-              setSettings={setSettings}
+              settings={accountSettings}
+              setSettings={setAccountSettings}
               schema={ACCOUNT_SCHEMA}
+              onSave={() => {}}
             />
-            <Button onClick={() => {}} variant="outline">
-              Save
-            </Button>
           </CardContent>
         </Card>
       </TabsContent>
