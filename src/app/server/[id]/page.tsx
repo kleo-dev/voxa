@@ -84,6 +84,7 @@ export default function Server() {
 
   return (
     <AppSidebar
+      user={user}
       server={
         {
           channels: [{ id: "general", name: "General", kind: "text" }],

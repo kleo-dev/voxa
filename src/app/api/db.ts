@@ -1,11 +1,12 @@
+import { envEnsure, envNumber } from "@/lib/env";
 import { Pool } from "pg";
 
 const pool = new Pool({
-  user: "klestiselimaj",
-  host: "localhost",
+  user: envEnsure("DB_USER"),
+  host: envEnsure("DB_HOST"),
   database: "postgres",
-  password: "",
-  port: 5432,
+  password: envEnsure("DB_PASSWORD"),
+  port: envNumber("DB_PORT") || 5432,
 });
 
 const createUsersTableQuery = `
