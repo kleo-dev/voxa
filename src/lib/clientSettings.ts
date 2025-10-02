@@ -5,13 +5,12 @@ export const defaultSettings: ClientSettings = {
   theme: "dark",
 };
 
-export function getClientSettings(): ClientSettings {
-  const s_cookie = Cookies.get("settings");
+export function parseClientSettings(s?: string): ClientSettings {
   let parsed: Partial<ClientSettings> = {};
 
-  if (s_cookie) {
+  if (s) {
     try {
-      parsed = JSON.parse(s_cookie);
+      parsed = JSON.parse(s);
     } catch {
       parsed = {};
     }
@@ -21,6 +20,10 @@ export function getClientSettings(): ClientSettings {
     ...defaultSettings,
     ...parsed,
   };
+}
+
+export function getClientSettings(): ClientSettings {
+  return parseClientSettings(Cookies.get("settings"));
 }
 
 export function setClientSettings(value?: ClientSettings) {

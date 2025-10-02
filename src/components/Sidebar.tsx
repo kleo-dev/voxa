@@ -5,6 +5,7 @@ import {
   MessageCircle,
   Plus,
   Search,
+  SettingsIcon,
   Volume2Icon,
 } from "lucide-react";
 import Server from "@/types/server";
@@ -24,16 +25,21 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
 import Channel from "@/types/channel";
+import Link from "next/link";
+import { NumberMap } from "@/types/typeUtils";
+import { User } from "@/hooks/get-user";
 
 export default function AppSidebar({
+  user,
   server,
   children,
 }: Readonly<{
   server?: Server;
+  user: User | null;
   children: React.ReactNode;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
@@ -143,6 +149,12 @@ export default function AppSidebar({
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          <footer className="mt-auto">
+            <Link href="/settings">
+              <SettingsIcon />
+            </Link>
+          </footer>
         </div>
 
         {/* Right column */}
@@ -177,6 +189,10 @@ export default function AppSidebar({
               )}
             </div>
           </ScrollArea>
+
+          <footer className="mt-auto pb-3 pl-3 pr-3">
+            <DMItem name={user?.username || "Loading.."} status="online" />
+          </footer>
         </div>
       </div>
 
@@ -189,6 +205,7 @@ function DMItem({ name, status }: { name: string; status: string }) {
   return (
     <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
       <Avatar className="h-8 w-8">
+        <AvatarImage src="https://github.com/kleo-dev.png" alt={name} />
         <AvatarFallback>{name[0]}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col">

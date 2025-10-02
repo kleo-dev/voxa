@@ -18,6 +18,7 @@ import remarkGfm from "remark-gfm";
 import { NumberMap, StringMap } from "@/types/typeUtils";
 import { User } from "@/hooks/get-user";
 import axios from "axios";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 function MessageContainer({
   message,
@@ -40,7 +41,18 @@ function MessageContainer({
   return (
     <div className="flex flex-col gap-3 rounded-lg p-4 hover:bg-accent">
       <div className="flex gap-2">
-        <div className="w-8 h-8 rounded-full bg-gray-400" />
+        {/* <div className="w-8 h-8 rounded-full bg-gray-400" /> */}
+        <Avatar className="h-8 w-8">
+          <AvatarImage
+            src="https://github.com/kleo-dev.png"
+            alt={message.from.toString()}
+          />
+          <AvatarFallback>
+            {userList[message.from]
+              ? userList[message.from].username
+              : message.from}
+          </AvatarFallback>
+        </Avatar>
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
             {userList[message.from]
