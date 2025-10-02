@@ -1,3 +1,16 @@
+## Setup
+### Requirements
+- Node.Js with npm
+- Postgres DB
+
+```python
+DB_USER= # Usually related to the OS username but do your own research
+DB_HOST=localhost
+DB_PASSWORD= # Can be empty
+DB_PORT=5432 # Optional
+```
+
+
 ## Keywords
 
 - Voxa Client: The user-side app which communicates with all below.
