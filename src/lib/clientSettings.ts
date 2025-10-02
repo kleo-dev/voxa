@@ -1,7 +1,7 @@
-import { ClientSettings } from "@/types/config";
+import { ClientSettings } from "@/types/settings";
 import Cookies from "js-cookie";
 
-const defaultSettings: ClientSettings = {
+export const defaultSettings: ClientSettings = {
   theme: "dark",
 };
 
