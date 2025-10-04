@@ -14,6 +14,7 @@ import auth, { makeAddress } from "@/lib/auth";
 export default function AppHome() {
   // Again we assume a static id, specifically Alice's user id
   // const { id } = useParams<{ id: string }>();
+  const id = 667;
   const ip = "localhost";
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -35,13 +36,15 @@ export default function AppHome() {
         channelName="Alice"
         userList={userList}
         setUserList={setUserList}
-        messages={messages.filter((m) => m.channel_id === "alice").toReversed()}
+        messages={messages
+          .filter((m) => m.channel_id === id || m.from === id)
+          .toReversed()}
         sendMessage={(message) => {
           wsRef.current?.send(
             JSON.stringify({
               type: "send_message",
               params: {
-                channel_id: "alice",
+                channel_id: id,
                 contents: message,
               },
             })
