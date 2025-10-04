@@ -1,18 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import Message from "@/types/message";
 import useUser, { User } from "@/hooks/get-user";
 import { NumberMap } from "@/types/typeUtils";
-import ServerType from "@/types/server";
 import auth, { makeAddress } from "@/lib/auth";
 
-export default function Server() {
-  const { id: ip } = useParams<{ id: string }>();
-  const [server, setServer] = useState<undefined | ServerType>();
+// In this testing instance we are assuming that Alice's node is localhost
+// To make this functional we need to add a settings feature to the api
+
+export default function AppHome() {
+  // Again we assume a static id, specifically Alice's user id
+  // const { id } = useParams<{ id: string }>();
+  const id = 667;
+  const ip = "localhost";
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const { user, loading } = useUser();
@@ -20,7 +23,7 @@ export default function Server() {
 
   useEffect(() => {
     if (!ip || !user || loading) return;
-    auth(makeAddress(ip), wsRef, setServer, setMessages);
+    auth(makeAddress(ip, 7090), wsRef, () => {}, setMessages);
     setUserList((prev) => {
       prev[user.id] = user;
       return prev;
@@ -28,28 +31,20 @@ export default function Server() {
   }, [ip, user, loading]);
 
   return (
-    <AppSidebar
-      user={user}
-      server={
-        {
-          channels: [{ id: "general", name: "General", kind: "text" }],
-          ...server,
-        } as ServerType
-      }
-    >
+    <AppSidebar user={user}>
       <MessageBox
-        channelName="General"
+        channelName="Alice"
         userList={userList}
         setUserList={setUserList}
         messages={messages
-          .filter((m) => m.channel_id === "general")
+          .filter((m) => m.channel_id === id || m.from === id)
           .toReversed()}
         sendMessage={(message) => {
           wsRef.current?.send(
             JSON.stringify({
               type: "send_message",
               params: {
-                channel_id: "general",
+                channel_id: id,
                 contents: message,
               },
             })

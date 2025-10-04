@@ -40,7 +40,7 @@ export default function AppSidebar({
 }: Readonly<{
   server?: Server;
   user: User | null;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
@@ -70,7 +70,7 @@ export default function AppSidebar({
       <div className="h-screen flex border-r">
         <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
           <Button
-            onClick={() => router.push(`/home`)}
+            onClick={() => router.push(`/chat`)}
             className="bg-transparent text-accent-foreground hover:text-accent"
           >
             <MessageCircle className="h-6 w-6" />
