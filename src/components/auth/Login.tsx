@@ -37,7 +37,7 @@ export default function Login() {
       });
 
       // small delay to show feedback before redirect
-      setTimeout(() => router.push("/home"), 800);
+      setTimeout(() => router.push("/chat"), 800);
     } catch (err: any) {
       setFeedback({
         kind: "error",

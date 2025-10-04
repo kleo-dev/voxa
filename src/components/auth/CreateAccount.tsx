@@ -71,7 +71,7 @@ export default function CreateAccount() {
       Cookies.set("token", (res.data as any).token);
 
       setFeedback({ kind: "info", message: "Account created! Redirecting..." });
-      setTimeout(() => router.push("/home"), 1000);
+      setTimeout(() => router.push("/chat"), 1000);
     } catch (err: any) {
       setFeedback({
         kind: "error",
