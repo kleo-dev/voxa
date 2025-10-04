@@ -3,6 +3,10 @@ import Server from "@/types/server";
 import axios from "axios";
 import { Dispatch, RefObject, SetStateAction } from "react";
 
+export function makeAddress(ip: string, defaultPort = 7080) {
+  return ip.includes(":") ? `${ip}` : `${ip}:${defaultPort}`;
+}
+
 export default async function auth(
   ip: string,
   wsRef: RefObject<WebSocket | null>,
@@ -14,7 +18,7 @@ export default async function auth(
   ).token;
 
   // Open the WebSocket connection
-  const ws = new WebSocket(`ws://${ip}:7080`);
+  const ws = new WebSocket(`ws://${ip}`);
   wsRef.current = ws;
 
   ws.onopen = () => {

@@ -6,7 +6,7 @@ import AppSidebar from "@/components/Sidebar";
 import Message from "@/types/message";
 import useUser, { User } from "@/hooks/get-user";
 import { NumberMap } from "@/types/typeUtils";
-import auth from "@/lib/auth";
+import auth, { makeAddress } from "@/lib/auth";
 
 // In this testing instance we are assuming that Alice's node is localhost
 // To make this functional we need to add a settings feature to the api
@@ -22,7 +22,7 @@ export default function AppHome() {
 
   useEffect(() => {
     if (!ip || !user || loading) return;
-    auth(ip, wsRef, () => {}, setMessages);
+    auth(makeAddress(ip, 7090), wsRef, () => {}, setMessages);
     setUserList((prev) => {
       prev[user.id] = user;
       return prev;

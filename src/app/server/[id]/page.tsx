@@ -8,7 +8,7 @@ import Message from "@/types/message";
 import useUser, { User } from "@/hooks/get-user";
 import { NumberMap } from "@/types/typeUtils";
 import ServerType from "@/types/server";
-import auth from "@/lib/auth";
+import auth, { makeAddress } from "@/lib/auth";
 
 export default function Server() {
   const { id: ip } = useParams<{ id: string }>();
@@ -20,7 +20,7 @@ export default function Server() {
 
   useEffect(() => {
     if (!ip || !user || loading) return;
-    auth(ip, wsRef, setServer, setMessages);
+    auth(makeAddress(ip), wsRef, setServer, setMessages);
     setUserList((prev) => {
       prev[user.id] = user;
       return prev;
