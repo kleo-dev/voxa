@@ -40,7 +40,7 @@ export default function AppSidebar({
 }: Readonly<{
   server?: Server;
   user: User | null;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
