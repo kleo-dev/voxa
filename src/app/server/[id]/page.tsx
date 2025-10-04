@@ -6,10 +6,9 @@ import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import Message from "@/types/message";
 import useUser, { User } from "@/hooks/get-user";
-import Cookies from "js-cookie";
-import axios from "axios";
-import { NumberMap, StringMap } from "@/types/typeUtils";
+import { NumberMap } from "@/types/typeUtils";
 import ServerType from "@/types/server";
+import auth from "@/lib/auth";
 
 export default function Server() {
   const { id: ip } = useParams<{ id: string }>();
@@ -21,61 +20,7 @@ export default function Server() {
 
   useEffect(() => {
     if (!ip || !user || loading) return;
-
-    async function auth() {
-      const server_auth = (
-        (await axios.post("/api/auth", { server_ip: ip })).data as any
-      ).token;
-
-      // Open the WebSocket connection
-      const ws = new WebSocket(`ws://${ip}:7080`);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        console.log("Connected to WebSocket:", ip);
-        ws.send(
-          JSON.stringify({
-            version: "0.0.1",
-            auth_token: server_auth,
-            last_message: 0,
-          })
-        );
-      };
-
-      ws.onmessage = (m) => {
-        const data = JSON.parse(m.data);
-        console.log("Message received:", data);
-
-        if (data.version) {
-          setServer(data);
-          return;
-        }
-
-        switch (data.type) {
-          case "authenticated":
-            setMessages(data.params.messages);
-
-          case "message_create":
-            // setMessages([...messages, data.params]);
-            setMessages((prev) => [...prev, data.params]);
-        }
-      };
-
-      ws.onerror = (err) => {
-        console.error("WebSocket error:", err);
-      };
-
-      ws.onclose = () => {
-        console.log("WebSocket closed:", ip);
-      };
-
-      // Cleanup on unmount or id change
-      return () => {
-        ws.close();
-      };
-    }
-
-    auth();
+    auth(ip, wsRef, setServer, setMessages);
     setUserList((prev) => {
       prev[user.id] = user;
       return prev;

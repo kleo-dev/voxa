@@ -1,20 +1,52 @@
 "use client";
 
-import AppSidebar from "@/components/Sidebar";
+import { useEffect, useRef, useState } from "react";
 import MessageBox from "@/components/MessageBox";
-import useUser from "@/hooks/get-user";
+import AppSidebar from "@/components/Sidebar";
+import Message from "@/types/message";
+import useUser, { User } from "@/hooks/get-user";
+import { NumberMap } from "@/types/typeUtils";
+import auth from "@/lib/auth";
 
-export default function HomePage() {
+// In this testing instance we are assuming that Alice's node is localhost
+// To make this functional we need to add a settings feature to the api
+
+export default function AppHome() {
+  // Again we assume a static id, specifically Alice's user id
+  // const { id } = useParams<{ id: string }>();
+  const ip = "localhost";
+  const wsRef = useRef<WebSocket | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const { user, loading } = useUser();
+  const [userList, setUserList] = useState<NumberMap<User>>({});
+
+  useEffect(() => {
+    if (!ip || !user || loading) return;
+    auth(ip, wsRef, () => {}, setMessages);
+    setUserList((prev) => {
+      prev[user.id] = user;
+      return prev;
+    });
+  }, [ip, user, loading]);
 
   return (
     <AppSidebar user={user}>
       <MessageBox
         channelName="Alice"
-        messages={[]}
-        userList={[]}
-        setUserList={() => {}}
-        sendMessage={() => {}}
+        userList={userList}
+        setUserList={setUserList}
+        messages={messages.filter((m) => m.channel_id === "alice").toReversed()}
+        sendMessage={(message) => {
+          wsRef.current?.send(
+            JSON.stringify({
+              type: "send_message",
+              params: {
+                channel_id: "alice",
+                contents: message,
+              },
+            })
+          );
+        }}
       />
     </AppSidebar>
   );
