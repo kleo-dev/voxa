@@ -11,7 +11,8 @@ export default async function auth(
   ip: string,
   wsRef: RefObject<WebSocket | null>,
   setServer: Dispatch<SetStateAction<Server | undefined>>,
-  setMessages: Dispatch<SetStateAction<Message[]>>
+  setMessages: Dispatch<SetStateAction<Message[]>>,
+  onNewMessage?: (m: Message) => void
 ) {
   const server_auth = (
     (await axios.post("/api/auth", { server_ip: ip })).data as any
@@ -44,10 +45,12 @@ export default async function auth(
     switch (data.type) {
       case "authenticated":
         setMessages(data.params.messages);
+        break;
 
       case "message_create":
-        // setMessages([...messages, data.params]);
+        if (onNewMessage) onNewMessage(data.params as Message);
         setMessages((prev) => [...prev, data.params]);
+        break;
     }
   };
 
