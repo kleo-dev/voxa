@@ -32,6 +32,7 @@ import Channel from "@/types/channel";
 import Link from "next/link";
 import { NumberMap } from "@/types/typeUtils";
 import { User } from "@/hooks/get-user";
+import ProfilePicture from "./ProfilePicture";
 
 export default function AppSidebar({
   user,
@@ -204,10 +205,7 @@ export default function AppSidebar({
 function DMItem({ name, status }: { name: string; status: string }) {
   return (
     <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
-      <Avatar className="h-8 w-8">
-        <AvatarImage src="https://github.com/kleo-dev.png" alt={name} />
-        <AvatarFallback>{name[0]}</AvatarFallback>
-      </Avatar>
+      <ProfilePicture name={name} />
       <div className="flex flex-col">
         <span className="text-sm font-medium">{name}</span>
         <span className="text-xs text-muted-foreground">{status}</span>
