@@ -1,5 +1,4 @@
-import Message from "@/types/message";
-import Server from "@/types/server";
+import { Message, Server } from "@/types/types";
 import axios from "axios";
 import { Dispatch, RefObject, SetStateAction } from "react";
 

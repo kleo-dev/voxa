@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
-import Message from "@/types/message";
+import { Message, Server as ServerType } from "@/types/types";
 import useUser, { User } from "@/hooks/get-user";
 import { NumberMap } from "@/types/typeUtils";
-import ServerType from "@/types/server";
 import auth, { makeAddress } from "@/lib/auth";
 
 export default function Server() {

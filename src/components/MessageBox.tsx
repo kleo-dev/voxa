@@ -1,6 +1,6 @@
 "use client";
 
-import Message from "@/types/message";
+import { Message } from "@/types/types";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import * as emoji from "emoji-picker-react";

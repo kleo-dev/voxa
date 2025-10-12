@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
-import Message from "@/types/message";
+import { Message } from "@/types/types";
 import useUser, { User } from "@/hooks/get-user";
 import { NumberMap } from "@/types/typeUtils";
 import auth, { makeAddress } from "@/lib/auth";

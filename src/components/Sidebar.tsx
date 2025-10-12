@@ -8,7 +8,7 @@ import {
   SettingsIcon,
   Volume2Icon,
 } from "lucide-react";
-import Server from "@/types/server";
+import { Server, Channel } from "@/types/types";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import {
@@ -28,7 +28,6 @@ import { Card } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
-import Channel from "@/types/channel";
 import Link from "next/link";
 import { NumberMap } from "@/types/typeUtils";
 import { User } from "@/hooks/get-user";
