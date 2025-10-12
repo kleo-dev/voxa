@@ -32,7 +32,7 @@ function MessageContainer({
 }) {
   useEffect(() => {
     axios
-      .get("/api/user/", { params: { id: message.from } })
+      .get("/api/profile/", { params: { id: message.from } })
       .then((res) =>
         setUserList((prev) => ({ ...prev, [message.from]: res.data as User }))
       )

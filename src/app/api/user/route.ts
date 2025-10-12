@@ -1,112 +1,133 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool, { initDb } from "../db";
 import { StatusCodes } from "http-status-codes";
-import { CLIENT_AUTH_TOKENS } from "../auth/auth";
+import { supabase } from "../supa";
 
+/**
+ * POST /api/user
+ * Register new user
+ * Body: { name, username, email, password }
+ */
 export async function POST(req: NextRequest) {
-  let { name, username, email, password } = await req.json();
+  const { name, username, email, password } = await req.json();
 
-  const user_ = await pool.query(
-    "SELECT id, username, email FROM users WHERE username = $1;",
-    [username]
-  );
+  if (!email || !password || !username)
+    return NextResponse.json(
+      { message: "Missing required fields" },
+      { status: StatusCodes.BAD_REQUEST }
+    );
 
-  if (user_.rows.length > 0) {
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (existing)
     return NextResponse.json(
       { message: "Username already used" },
       { status: StatusCodes.CONFLICT }
     );
-  }
 
-  const user_email = await pool.query(
-    "SELECT id, username, email FROM users WHERE email = $1;",
-    [email]
-  );
+  const { data: authData, error: authError } =
+    await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name, username },
+    });
 
-  if (user_email.rows.length > 0) {
+  if (authError)
     return NextResponse.json(
-      { message: "Email already used" },
-      { status: StatusCodes.CONFLICT }
-    );
-  }
-
-  // TODO: Hash the password
-  const result = await pool.query(
-    "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id;",
-    [username, email, password]
-  );
-  const token = crypto.randomUUID();
-
-  CLIENT_AUTH_TOKENS[token] = parseInt(result.rows[0].id);
-
-  return NextResponse.json({
-    message: "ok",
-    token,
-    user_id: result.rows[0].id,
-  });
-}
-
-export async function PUT(req: NextRequest) {
-  const { username, password } = await req.json();
-
-  if (!username || !password)
-    return NextResponse.json(
-      { message: "Body must have username and password" },
+      { message: authError.message },
       { status: StatusCodes.BAD_REQUEST }
     );
 
-  const user = await pool.query(
-    "SELECT id, username, email FROM users WHERE password_hash = $2 AND username = $1 OR email = $1;",
-    [username, password]
-  );
+  await supabase.from("profiles").insert({
+    id: authData.user.id,
+    name,
+    username,
+  });
 
-  if (user.rowCount === 0)
+  return NextResponse.json({
+    message: "ok",
+    user_id: authData.user.id,
+  });
+}
+
+/**
+ * GET /api/user
+ * Login user
+ * Params: { username, password }
+ */
+export async function GET(req: NextRequest) {
+  const params = new URL(req.url).searchParams;
+  const [username, password] = [params.get("username"), params.get("password")];
+
+  if (!username || !password)
+    return NextResponse.json(
+      { message: "Params username and password are required" },
+      { status: StatusCodes.BAD_REQUEST }
+    );
+
+  let email = username;
+  if (!username.includes("@")) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("email", username)
+      .maybeSingle();
+    email = data?.email;
+  }
+
+  if (!email)
+    return NextResponse.json(
+      { message: "Invalid username" },
+      { status: StatusCodes.UNAUTHORIZED }
+    );
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error)
     return NextResponse.json(
       { message: "Invalid credentials" },
       { status: StatusCodes.UNAUTHORIZED }
     );
 
-  const token = crypto.randomUUID();
+  const { session } = data;
+  const res = NextResponse.json({
+    message: "ok",
+    access_token: session?.access_token,
+    refresh_token: session?.refresh_token,
+    user_id: session?.user?.id,
+  });
 
-  CLIENT_AUTH_TOKENS[token] = parseInt(user.rows[0].id);
+  // Optionally set cookie
+  res.cookies.set("token", session?.access_token ?? "", { httpOnly: true });
 
-  return NextResponse.json({ message: "ok", token });
+  return res;
 }
 
-export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  let query_id = url.searchParams.get("id");
-  const token = req.cookies.get("token")?.value;
-
-  if (!query_id && !token)
-    return NextResponse.json(
-      { message: "Query arg should be token or id" },
-      { status: StatusCodes.BAD_REQUEST }
-    );
-  else {
-    const id = query_id ? parseInt(query_id) : token ? CLIENT_AUTH_TOKENS[token] : null;
-
-    if (!id)
-      return NextResponse.json(
-        { message: "Invalid token" },
-        { status: StatusCodes.NOT_FOUND }
-      );
-
-    const user = await pool.query(
-      "SELECT id, username, email FROM users WHERE id = $1;",
-      [id]
-    );
-
-    return NextResponse.json({ message: "ok", ...user.rows[0] });
-  }
-}
-
+/**
+ * DELETE /api/auth
+ * Body: { username }
+ */
 export async function DELETE(req: NextRequest) {
-  let { username } = await req.json();
+  const { username } = await req.json();
 
-  await pool.query("DELETE FROM users WHERE username = $1;", [username]);
+  // Delete both profile + auth user
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (profile) {
+    await supabase.auth.admin.deleteUser(profile.id);
+    await supabase.from("profiles").delete().eq("id", profile.id);
+  }
 
   return NextResponse.json({ message: "ok" });
 }
-
-initDb();

@@ -25,7 +25,7 @@ export default function useUser() {
       }
 
       try {
-        const res = (await axios.get("/api/user")).data as User;
+        const res = (await axios.get("/api/profile")).data as User;
 
         setUser(res);
       } catch {

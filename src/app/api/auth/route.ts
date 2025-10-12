@@ -1,32 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CLIENT_AUTH_TOKENS, SERVER_AUTH_TOKENS } from "./auth";
 import { StatusCodes } from "http-status-codes";
-import axios from "axios";
+import { supabase } from "../supa";
 
+const SERVER_AUTH_TOKENS = new Map<
+  string,
+  { user_id: string; server_ip: string }
+>();
+
+/**
+ * GET /api/auth?token=<relayToken>
+ * Called by a (DM node / Server) to verify a temporary relay token.
+ */
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
 
-  if (!token)
+  if (!token) {
     return NextResponse.json(
       { message: "There should be a token parameter" },
       { status: StatusCodes.BAD_REQUEST }
     );
+  }
 
-  const auth = SERVER_AUTH_TOKENS[token];
-
-  if (!auth)
+  const auth = SERVER_AUTH_TOKENS.get(token);
+  if (!auth) {
     return NextResponse.json(
-      { message: "Invalid token" },
+      { message: "Invalid or expired token" },
       { status: StatusCodes.NOT_FOUND }
     );
+  }
 
   const ip =
     req.headers.get("x-real-ip") ||
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
     "127.0.0.1";
 
-  // ::1 for testing
   if (auth.server_ip !== ip && ip !== "::1") {
     return NextResponse.json(
       { message: "Invalid address" },
@@ -34,35 +42,49 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  delete SERVER_AUTH_TOKENS[token];
+  SERVER_AUTH_TOKENS.delete(token);
 
   return NextResponse.json({ message: "ok", ...auth });
 }
 
+/**
+ * POST /api/auth
+ * Called by the client to request a temporary relay token for a DM server.
+ *
+ * Body: { server_ip: string }
+ * Header: Authorization: Bearer <supabase_jwt>
+ */
 export async function POST(req: NextRequest) {
-  let { server_ip } = await req.json();
-  const session_token = req.cookies.get("token")?.value;
+  const { server_ip } = await req.json();
+  const authHeader = req.cookies.get("token");
 
-  if (!session_token)
+  if (!authHeader) {
     return NextResponse.json(
-      { message: "Token cookie not found" },
+      { message: "Missing Supabase Authorization header" },
+      { status: StatusCodes.BAD_REQUEST }
+    );
+  }
+
+  const supabaseToken = authHeader.value;
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser(supabaseToken);
+
+  if (error || !user) {
+    return NextResponse.json(
+      { message: "Invalid Supabase token" },
       { status: StatusCodes.UNAUTHORIZED }
     );
+  }
 
-  const token = crypto.randomUUID();
+  const relayToken = crypto.randomUUID();
 
-  const user_id = CLIENT_AUTH_TOKENS[session_token];
-
-  if (!user_id)
-    return NextResponse.json(
-      { message: "Invalid token" },
-      { status: StatusCodes.NOT_FOUND }
-    );
-
-  SERVER_AUTH_TOKENS[token] = {
-    user_id,
+  SERVER_AUTH_TOKENS.set(relayToken, {
+    user_id: user.id,
     server_ip: String(server_ip),
-  };
+  });
 
-  return NextResponse.json({ message: "ok", token });
+  return NextResponse.json({ message: "ok", token: relayToken });
 }

@@ -28,7 +28,9 @@ export default function Login() {
   const login = async () => {
     setFeedback(undefined);
     try {
-      const res = await axios.put("/api/user", { username, password });
+      const res = await axios.get("/api/user", {
+        params: { username, password },
+      });
 
       Cookies.set("token", (res.data as any).token);
       setFeedback({
