@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export interface User {
-  id: number;
+  id: string;
   username: string;
-  email: string;
+  display_name: string;
+  avatar_url: string;
 }
 
 export default function useUser() {

@@ -56,7 +56,7 @@ export default function Login() {
       </CardHeader>
       <CardContent className="gap-3 flex flex-col">
         <span>
-          Username or email
+          Email
           <Input onChange={(e) => setUsername(e.target.value)} type="email" />
         </span>
         <span>

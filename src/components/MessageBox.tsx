@@ -44,16 +44,17 @@ function MessageContainer({
       <div className="flex gap-2">
         {/* <div className="w-8 h-8 rounded-full bg-gray-400" /> */}
         <ProfilePicture
+          url={userList[message.from]?.avatar_url}
           name={String(
             userList[message.from]
-              ? userList[message.from].username
+              ? userList[message.from].display_name
               : message.from
           )}
         />
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
             {userList[message.from]
-              ? userList[message.from].username
+              ? userList[message.from].display_name
               : message.from}
 
             <p className="text-neutral-500 text-xs">

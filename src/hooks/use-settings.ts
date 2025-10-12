@@ -1,7 +1,7 @@
 "use client";
 
 import { defaultSettings, getClientSettings } from "@/lib/clientSettings";
-import { AccountSettings, ClientSettings } from "@/types/settings";
+import { ProfileSettings, ClientSettings } from "@/types/settings";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export function useClientSettings(): [
@@ -17,13 +17,32 @@ export function useClientSettings(): [
   return [settings, setSettings];
 }
 
-export function useAccountSettings(): [
-  AccountSettings,
-  Dispatch<SetStateAction<AccountSettings>>
+export function useProfileSettings(): [
+  ProfileSettings,
+  Dispatch<SetStateAction<ProfileSettings>>
 ] {
-  const [settings, setSettings] = useState<AccountSettings>({
-    node_ip: "node0.voxa.org",
+  const [settings, setSettings] = useState<ProfileSettings>({
+    node_address: "",
+    username: "",
+    display_name: "",
+    avatar_url: "",
   });
+
+  useEffect(() => {
+    async function fetchProfileSettings() {
+      try {
+        const res = await fetch("/api/profile");
+        if (res.ok) {
+          const data = (await res.json()) as ProfileSettings;
+          setSettings(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile settings:", error);
+      }
+    }
+
+    fetchProfileSettings();
+  }, []);
 
   return [settings, setSettings];
 }
