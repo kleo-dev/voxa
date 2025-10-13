@@ -70,7 +70,7 @@ export default function Settings<T>({
     if (Array.isArray(type)) {
       return (
         <Select
-          value={(settings as any)[key]}
+          value={(settings as any)[key] || []}
           onValueChange={(val) => handleChange(key, val)}
         >
           <SelectTrigger className="w-[200px]">
@@ -88,7 +88,7 @@ export default function Settings<T>({
     } else if (type === "boolean") {
       return (
         <Checkbox
-          checked={(settings as any)[key]}
+          checked={(settings as any)[key] || false}
           onCheckedChange={(val) => handleChange(key, val)}
         />
       );
@@ -96,7 +96,7 @@ export default function Settings<T>({
       return (
         <Input
           type="text"
-          value={(settings as any)[key]}
+          value={(settings as any)[key] || ""}
           onChange={(e) => handleChange(key, e.target.value)}
         />
       );
@@ -104,7 +104,7 @@ export default function Settings<T>({
       return (
         <Input
           type="number"
-          value={(settings as any)[key]}
+          value={(settings as any)[key] || 0}
           onChange={(e) => handleChange(key, Number(e.target.value))}
         />
       );

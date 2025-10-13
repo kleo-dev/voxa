@@ -5,7 +5,7 @@ import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import { Message } from "@/types/types";
 import useUser, { User } from "@/hooks/get-user";
-import { NumberMap } from "@/types/typeUtils";
+import { NumberMap, StringMap } from "@/types/typeUtils";
 import auth, { makeAddress } from "@/lib/auth";
 import { useParams } from "next/navigation";
 
@@ -14,19 +14,21 @@ import { useParams } from "next/navigation";
 
 export default function DMs() {
   const { id } = useParams<{ id: string }>();
-  const numericId = id ? Number(id) : undefined;
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const { user, loading } = useUser();
-  const [userList, setUserList] = useState<NumberMap<User>>({});
+  const [userList, setUserList] = useState<StringMap<User>>({});
 
   useEffect(() => {
-    if (!numericId || !user || loading) return;
-    auth(makeAddress("localhost", 7090), wsRef, () => {}, setMessages);
-    setUserList((prev) => {
-      prev[user.id] = user;
-      return prev;
-    });
+    async function fetchInitialData() {
+      if (!user || loading) return;
+      await auth(makeAddress("localhost", 7090), wsRef, () => {}, setMessages);
+      setUserList((prev) => {
+        prev[user.id] = user;
+        return prev;
+      });
+    }
+    fetchInitialData();
   }, [id, user, loading]);
 
   return (
@@ -36,14 +38,14 @@ export default function DMs() {
         userList={userList}
         setUserList={setUserList}
         messages={messages
-          .filter((m) => m.channel_id === numericId || m.from === numericId)
+          .filter((m) => m.channel_id === id || m.from === id)
           .toReversed()}
         sendMessage={(message) => {
           wsRef.current?.send(
             JSON.stringify({
               type: "send_message",
               params: {
-                channel_id: numericId,
+                channel_id: id,
                 contents: message,
               },
             })

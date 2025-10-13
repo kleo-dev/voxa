@@ -6,8 +6,8 @@ export interface Channel {
 
 export interface Message {
   id: number;
-  channel_id: string | number;
-  from: number;
+  channel_id: string;
+  from: string;
   contents: string;
   timestamp: number;
 }
