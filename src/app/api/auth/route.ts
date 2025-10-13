@@ -4,23 +4,35 @@ import { supabase } from "../supa";
 
 const SERVER_AUTH_TOKENS = new Map<
   string,
-  { user_id: string; server_ip: string }
+  { user_id: string; server_id: string }
 >();
 
 /**
- * GET /api/auth?token=<relayToken>
+ * GET /api/auth?token=<relayToken>?key=<serverKey>
  * Called by a (DM node / Server) to verify a temporary relay token.
  */
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
+  const key = url.searchParams.get("key");
 
-  if (!token) {
+  if (!token || !key) {
     return NextResponse.json(
-      { message: "There should be a token parameter" },
+      { message: "There should be a token and a key parameter" },
       { status: StatusCodes.BAD_REQUEST }
     );
   }
+
+  const { data: server } = await supabase
+    .from("servers")
+    .select("id, created_at, owner, address")
+    .eq("key", key)
+    .maybeSingle();
+  if (!server)
+    return NextResponse.json(
+      { message: "Key unauthorized" },
+      { status: StatusCodes.UNAUTHORIZED }
+    );
 
   const auth = SERVER_AUTH_TOKENS.get(token);
   if (!auth) {
@@ -30,19 +42,11 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const ip =
-    req.headers.get("x-real-ip") ||
-    req.headers.get("x-forwarded-for")?.split(",")[0] ||
-    "127.0.0.1";
-
-  console.log("Auth request from IP:", ip);
-
-  if (auth.server_ip !== ip && ip !== "::1") {
+  if (auth.server_id !== server.id)
     return NextResponse.json(
-      { message: "Invalid address" },
+      { message: "Invalid id" },
       { status: StatusCodes.UNAUTHORIZED }
     );
-  }
 
   SERVER_AUTH_TOKENS.delete(token);
 
@@ -53,19 +57,24 @@ export async function GET(req: NextRequest) {
  * POST /api/auth
  * Called by the client to request a temporary relay token for a DM server.
  *
- * Body: { server_ip: string }
+ * Body: { server_id: string }
  * Header: Authorization: Bearer <supabase_jwt>
  */
 export async function POST(req: NextRequest) {
-  const { server_ip } = await req.json();
+  const { server_id } = await req.json();
   const authHeader = req.cookies.get("token");
 
-  if (!authHeader) {
+  if (!server_id)
+    return NextResponse.json(
+      { message: "Missing server_id in the json body" },
+      { status: StatusCodes.BAD_REQUEST }
+    );
+
+  if (!authHeader)
     return NextResponse.json(
       { message: "Missing Supabase Authorization header" },
       { status: StatusCodes.BAD_REQUEST }
     );
-  }
 
   const supabaseToken = authHeader.value;
 
@@ -85,7 +94,7 @@ export async function POST(req: NextRequest) {
 
   SERVER_AUTH_TOKENS.set(relayToken, {
     user_id: user.id,
-    server_ip: String(server_ip),
+    server_id,
   });
 
   return NextResponse.json({ message: "ok", token: relayToken });

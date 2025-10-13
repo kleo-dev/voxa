@@ -5,7 +5,6 @@ import {
   MessageCircle,
   Plus,
   Search,
-  SettingsIcon,
   Volume2Icon,
 } from "lucide-react";
 import { Server, Channel, Message } from "@/types/types";
@@ -27,10 +26,9 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import useUser, { UserProfile } from "@/hooks/get-user";
 import ProfilePicture from "./ProfilePicture";
-import auth, { makeAddress } from "@/lib/auth";
+import auth from "@/lib/auth";
 import { toast } from "sonner";
 import { StringMap } from "@/types/typeUtils";
 import SettingsDialog from "./settings/SettingsDialog";
