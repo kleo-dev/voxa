@@ -5,7 +5,7 @@ import { Dispatch, RefObject, SetStateAction } from "react";
 async function getIP(domain: string) {
   const res = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
   const data = await res.json();
-  return data.Answer ? data.Answer[0].data : null;
+  return data.Answer[0]?.data || null;
 }
 
 export async function makeAddress(ip: string, defaultPort = 7080) {
@@ -25,7 +25,7 @@ export default async function auth(
   setMessages: Dispatch<SetStateAction<Message[]>>,
   onNewMessage?: (m: Message) => void
 ) {
-  const ip = makeAddress(address);
+  const ip = await makeAddress(address);
   console.log("Authenticating with server at:", ip);
   const server_auth = (
     (await axios.post("/api/auth", { server_ip: ip })).data as any
