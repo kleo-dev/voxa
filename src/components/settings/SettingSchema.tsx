@@ -25,7 +25,7 @@ export type SettingsSchema = StringMap<
   "boolean" | "string" | "number" | string[] | RegexSetting
 >;
 
-export default function Settings<T>({
+export default function SettingSchema<T>({
   settings,
   setSettings,
   schema,
@@ -73,7 +73,7 @@ export default function Settings<T>({
           value={(settings as any)[key] || []}
           onValueChange={(val) => handleChange(key, val)}
         >
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger>
             <SelectValue placeholder={key} />
           </SelectTrigger>
           <SelectContent>

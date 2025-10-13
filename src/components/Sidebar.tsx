@@ -33,6 +33,7 @@ import ProfilePicture from "./ProfilePicture";
 import auth, { makeAddress } from "@/lib/auth";
 import { toast } from "sonner";
 import { StringMap } from "@/types/typeUtils";
+import SettingsDialog from "./settings/SettingsDialog";
 
 export default function AppSidebar({
   children,
@@ -195,9 +196,7 @@ export default function AppSidebar({
           </Dialog>
 
           <footer className="mt-auto">
-            <Link href="/settings">
-              <SettingsIcon />
-            </Link>
+            <SettingsDialog />
           </footer>
         </div>
 
@@ -271,12 +270,10 @@ function DMItem({
         <span className="text-xs text-muted-foreground">{status}</span>
       </div>
       {settings && (
-        <Button
-          onClick={() => router.push(`/settings?tab=profile`)}
-          className="bg-transparent text-accent-foreground hover:text-accent ml-auto w-7 h-7 p-0 flex items-center justify-center rounded-md"
-        >
-          <SettingsIcon size={16} />
-        </Button>
+        <SettingsDialog
+          className="ml-auto w-7 h-7 p-0 flex items-center justify-center"
+          tab="profile"
+        />
       )}
     </Card>
   );

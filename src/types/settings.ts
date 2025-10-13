@@ -1,4 +1,7 @@
-import { RegexSetting, SettingsSchema } from "@/app/settings/settings";
+import {
+  RegexSetting,
+  SettingsSchema,
+} from "@/components/settings/SettingSchema";
 
 export interface ClientSettings {
   theme: "light" | "dark";
