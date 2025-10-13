@@ -16,25 +16,18 @@ export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const { user, loading } = useUser();
   const [userList, setUserList] = useState<StringMap<User>>({});
 
-  useEffect(() => {
-    async function fetchInitialData() {
-      if (!user || loading) return;
-      await auth(makeAddress("localhost", 7090), wsRef, () => {}, setMessages);
-      setUserList((prev) => {
-        prev[user.id] = user;
-        return prev;
-      });
-    }
-    fetchInitialData();
-  }, [id, user, loading]);
-
   return (
-    <AppSidebar user={user}>
+    <AppSidebar
+      setMessages={setMessages}
+      wsRef={wsRef}
+      userList={userList}
+      setUserList={setUserList}
+      chatWith={id}
+    >
       <MessageBox
-        channelName="Alice"
+        channelName={userList[id]?.display_name || id}
         userList={userList}
         setUserList={setUserList}
         messages={messages

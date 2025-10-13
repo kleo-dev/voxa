@@ -38,7 +38,7 @@ export default async function auth(
     console.log("Message received:", data);
 
     if (data.version) {
-      setServer(data);
+      setServer({ channels: [], ...data });
       return;
     }
 

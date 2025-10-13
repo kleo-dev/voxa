@@ -8,8 +8,8 @@ import {
   SettingsIcon,
   Volume2Icon,
 } from "lucide-react";
-import { Server, Channel } from "@/types/types";
-import { useEffect, useState } from "react";
+import { Server, Channel, Message } from "@/types/types";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import {
   Dialog,
@@ -25,31 +25,68 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { NumberMap } from "@/types/typeUtils";
-import { User } from "@/hooks/get-user";
+import useUser, { User } from "@/hooks/get-user";
 import ProfilePicture from "./ProfilePicture";
+import auth, { makeAddress } from "@/lib/auth";
+import { toast } from "sonner";
+import { StringMap } from "@/types/typeUtils";
 
 export default function AppSidebar({
-  user,
-  server,
   children,
+  chatWith,
+  wsRef,
+  setMessages,
+  onNewMessage,
 }: Readonly<{
-  server?: Server;
-  user: User | null;
+  wsRef: React.RefObject<WebSocket | null>;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  onNewMessage?: (msg: Message) => void;
+  userList: StringMap<User>;
+  setUserList: React.Dispatch<React.SetStateAction<StringMap<User>>>;
+  chatWith?: string;
   children?: React.ReactNode;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
+  const [server, setServer] = useState<Server | undefined>();
   const router = useRouter();
+  const user = useUser();
+  const [userList, setUserList] = useState<StringMap<User>>({});
+  const ip = "192.168.100.3";
 
   useEffect(() => {
     const s = Cookies.get("servers")?.split(",");
     if (s) setServers(s.map((x) => x.trim().split("@") as [string, string]));
   }, []);
+
+  useEffect(() => {
+    if (!ip || !user) return;
+    auth(
+      makeAddress(ip, 7090),
+      wsRef,
+      () => {},
+      setMessages,
+      (m) => {
+        if (m.from !== chatWith)
+          toast(`New message from ${m.from}`, {
+            description: m.contents.slice(0, 80),
+            action: {
+              label: "View",
+              onClick: () => router.push(`/chat/${m.from}`),
+            },
+          });
+
+        if (onNewMessage) onNewMessage(m);
+      }
+    );
+    setUserList((prev) => {
+      prev[user.id] = user;
+      return prev;
+    });
+  }, [chatWith, user]);
 
   const handleAddServer = () => {
     if (!newServer.ip) return;
@@ -204,7 +241,7 @@ export default function AppSidebar({
 function DMItem({ name, status }: { name: string; status: string }) {
   return (
     <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
-      <ProfilePicture name={name} />
+      <ProfilePicture name={name} url="" />
       <div className="flex flex-col">
         <span className="text-sm font-medium">{name}</span>
         <span className="text-xs text-muted-foreground">{status}</span>

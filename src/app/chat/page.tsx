@@ -1,41 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import AppSidebar from "@/components/Sidebar";
-import useUser, { User } from "@/hooks/get-user";
+import { User } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
-import auth, { makeAddress } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 import ProfilePicture from "@/components/ProfilePicture";
 
 export default function Chat() {
-  const ip = "localhost";
   const wsRef = useRef<WebSocket | null>(null);
-  const { user, loading } = useUser();
   const [userList, setUserList] = useState<StringMap<User>>({});
 
-  useEffect(() => {
-    if (!ip || !user || loading) return;
-    auth(
-      makeAddress(ip, 7090),
-      wsRef,
-      () => {},
-      () => {},
-      (m) => {
-        toast(`New message from ${m.from}`, {
-          description: m.contents.slice(0, 80),
-        });
-      }
-    );
-    setUserList((prev) => {
-      prev[user.id] = user;
-      return prev;
-    });
-  }, [ip, user, loading]);
-
   return (
-    <AppSidebar user={user}>
+    <AppSidebar
+      wsRef={wsRef}
+      userList={userList}
+      setUserList={setUserList}
+      setMessages={() => {}}
+    >
       <Card className="bg-background w-full">
         <CardHeader>
           <CardTitle>Direct Messages</CardTitle>
