@@ -13,6 +13,7 @@ export default async function auth(
   setMessages: Dispatch<SetStateAction<Message[]>>,
   onNewMessage?: (m: Message) => void
 ) {
+  console.log("Authenticating with server at:", ip);
   const server_auth = (
     (await axios.post("/api/auth", { server_ip: ip })).data as any
   ).token;
@@ -37,7 +38,7 @@ export default async function auth(
     console.log("Message received:", data);
 
     if (data.version) {
-      setServer(data);
+      setServer({ channels: [], ...data });
       return;
     }
 

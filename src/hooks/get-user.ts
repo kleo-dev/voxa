@@ -14,7 +14,6 @@ export interface User {
 
 export default function useUser() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,13 +30,11 @@ export default function useUser() {
         setUser(res);
       } catch {
         router.push("/login");
-      } finally {
-        setLoading(false);
       }
     }
 
     fetchUser();
   }, [router]);
 
-  return { user, loading };
+  return user;
 }

@@ -1,60 +1,47 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import MessageBox from "@/components/MessageBox";
+import { useRef, useState } from "react";
 import AppSidebar from "@/components/Sidebar";
-import { Message } from "@/types/types";
-import useUser, { User } from "@/hooks/get-user";
-import { NumberMap } from "@/types/typeUtils";
-import auth, { makeAddress } from "@/lib/auth";
+import { User } from "@/hooks/get-user";
+import { StringMap } from "@/types/typeUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "sonner";
 import ProfilePicture from "@/components/ProfilePicture";
 
 export default function Chat() {
-  const ip = "localhost";
   const wsRef = useRef<WebSocket | null>(null);
-  const { user, loading } = useUser();
-  const [userList, setUserList] = useState<NumberMap<User>>({});
-
-  useEffect(() => {
-    if (!ip || !user || loading) return;
-    auth(
-      makeAddress(ip, 7090),
-      wsRef,
-      () => {},
-      () => {},
-      (m) => {
-        toast(`New message from ${m.from}`, {
-          description: m.contents.slice(0, 80),
-        });
-      }
-    );
-    setUserList((prev) => {
-      prev[user.id] = user;
-      return prev;
-    });
-  }, [ip, user, loading]);
+  const [userList, setUserList] = useState<StringMap<User>>({});
 
   return (
-    <AppSidebar user={{ id: 173, username: "leo", email: "" }}>
+    <AppSidebar
+      wsRef={wsRef}
+      userList={userList}
+      setUserList={setUserList}
+      setMessages={() => {}}
+    >
       <Card className="bg-background w-full">
         <CardHeader>
           <CardTitle>Direct Messages</CardTitle>
         </CardHeader>
         <CardContent>
-          <DMItem name="Alice" status="online" />
+          <DMItem name="Alice" status="online" avatar="" />
         </CardContent>
       </Card>
     </AppSidebar>
   );
 }
 
-function DMItem({ name, status }: { name: string; status: string }) {
+function DMItem({
+  name,
+  avatar,
+  status,
+}: {
+  name: string;
+  avatar: string;
+  status: string;
+}) {
   return (
     <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
-      <ProfilePicture name={name} />
+      <ProfilePicture name={name} url={avatar} />
       <div className="flex flex-col">
         <span className="text-sm font-medium">{name}</span>
         <span className="text-xs text-muted-foreground">{status}</span>

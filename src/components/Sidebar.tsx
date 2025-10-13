@@ -8,8 +8,8 @@ import {
   SettingsIcon,
   Volume2Icon,
 } from "lucide-react";
-import { Server, Channel } from "@/types/types";
-import { useEffect, useState } from "react";
+import { Server, Channel, Message } from "@/types/types";
+import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import {
   Dialog,
@@ -25,31 +25,76 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { NumberMap } from "@/types/typeUtils";
-import { User } from "@/hooks/get-user";
+import useUser, { User } from "@/hooks/get-user";
 import ProfilePicture from "./ProfilePicture";
+import auth, { makeAddress } from "@/lib/auth";
+import { toast } from "sonner";
+import { StringMap } from "@/types/typeUtils";
+import SettingsDialog from "./settings/SettingsDialog";
 
 export default function AppSidebar({
-  user,
-  server,
   children,
+  chatWith,
+  wsRef,
+  setMessages,
+  onNewMessage,
+  setUser,
+  server,
 }: Readonly<{
-  server?: Server;
-  user: User | null;
+  wsRef: React.RefObject<WebSocket | null>;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  onNewMessage?: (msg: Message) => void;
+  userList: StringMap<User>;
+  setUserList: React.Dispatch<React.SetStateAction<StringMap<User>>>;
+  chatWith?: string;
   children?: React.ReactNode;
+  setUser?: React.Dispatch<React.SetStateAction<User | undefined>>;
+  server?: Server | undefined;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
   const router = useRouter();
+  const user = useUser();
+  const [userList, setUserList] = useState<StringMap<User>>({});
+  const ip = "192.168.100.3";
 
   useEffect(() => {
     const s = Cookies.get("servers")?.split(",");
     if (s) setServers(s.map((x) => x.trim().split("@") as [string, string]));
   }, []);
+
+  useEffect(() => {
+    if (!ip || !user) return;
+    if (setUser) setUser(user);
+    auth(
+      makeAddress(ip, 7090),
+      wsRef,
+      () => {},
+      setMessages,
+      (m) => {
+        if (m.from !== chatWith && m.from !== user.id)
+          toast(
+            `New message from ${userList[m.from]?.display_name || m.from}`,
+            {
+              description: m.contents.slice(0, 80),
+              action: {
+                label: "View",
+                onClick: () => router.push(`/chat/${m.from}`),
+              },
+            }
+          );
+
+        if (onNewMessage) onNewMessage(m);
+      }
+    );
+    setUserList((prev) => {
+      prev[user.id] = user;
+      return prev;
+    });
+  }, [chatWith, user]);
 
   const handleAddServer = () => {
     if (!newServer.ip) return;
@@ -151,9 +196,7 @@ export default function AppSidebar({
           </Dialog>
 
           <footer className="mt-auto">
-            <Link href="/settings">
-              <SettingsIcon />
-            </Link>
+            <SettingsDialog />
           </footer>
         </div>
 
@@ -182,16 +225,21 @@ export default function AppSidebar({
                 </>
               ) : (
                 <>
-                  <DMItem name="Alice" status="online" />
-                  <DMItem name="Bob" status="offline" />
-                  <DMItem name="Charlie" status="away" />
+                  <DMItem name="Alice" status="online" avatar="" />
+                  <DMItem name="Bob" status="offline" avatar="" />
+                  <DMItem name="Charlie" status="away" avatar="" />
                 </>
               )}
             </div>
           </ScrollArea>
 
           <footer className="mt-auto pb-3 pl-3 pr-3">
-            <DMItem name={user?.username || "Loading.."} status="online" />
+            <DMItem
+              name={user?.display_name || "Loading.."}
+              avatar={user?.avatar_url || ""}
+              status="online"
+              settings
+            />
           </footer>
         </div>
       </div>
@@ -201,14 +249,32 @@ export default function AppSidebar({
   );
 }
 
-function DMItem({ name, status }: { name: string; status: string }) {
+function DMItem({
+  name,
+  avatar,
+  status,
+  settings,
+}: {
+  name: string;
+  avatar: string;
+  status: string;
+  settings?: boolean;
+}) {
+  const router = useRouter();
+
   return (
     <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
-      <ProfilePicture name={name} />
+      <ProfilePicture name={name} url={avatar} />
       <div className="flex flex-col">
         <span className="text-sm font-medium">{name}</span>
         <span className="text-xs text-muted-foreground">{status}</span>
       </div>
+      {settings && (
+        <SettingsDialog
+          className="ml-auto w-7 h-7 p-0 flex items-center justify-center"
+          tab="profile"
+        />
+      )}
     </Card>
   );
 }
