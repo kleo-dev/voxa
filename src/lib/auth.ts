@@ -19,16 +19,16 @@ export async function makeAddress(ip: string, defaultPort = 7080) {
 }
 
 export default async function auth(
-  address: string,
+  ip: string,
   wsRef: RefObject<WebSocket | null>,
   setServer: Dispatch<SetStateAction<Server | undefined>>,
   setMessages: Dispatch<SetStateAction<Message[]>>,
   onNewMessage?: (m: Message) => void
 ) {
-  const ip = await makeAddress(address);
   console.log("Authenticating with server at:", ip);
   const server_auth = (
-    (await axios.post("/api/auth", { server_ip: ip })).data as any
+    (await axios.post("/api/auth", { server_ip: await makeAddress(ip) }))
+      .data as any
   ).token;
 
   // Open the WebSocket connection
