@@ -70,14 +70,17 @@ export default function AppSidebar({
       () => {},
       setMessages,
       (m) => {
-        if (m.from !== chatWith)
-          toast(`New message from ${m.from}`, {
-            description: m.contents.slice(0, 80),
-            action: {
-              label: "View",
-              onClick: () => router.push(`/chat/${m.from}`),
-            },
-          });
+        if (m.from !== chatWith && m.from !== user.id)
+          toast(
+            `New message from ${userList[m.from]?.display_name || m.from}`,
+            {
+              description: m.contents.slice(0, 80),
+              action: {
+                label: "View",
+                onClick: () => router.push(`/chat/${m.from}`),
+              },
+            }
+          );
 
         if (onNewMessage) onNewMessage(m);
       }
