@@ -7,15 +7,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { CardContent } from "@/components/ui/card";
 import { PROFILE_SCHEMA, CLIENT_SCHEMA } from "@/types/settings";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftCircle } from "lucide-react";
 import axios from "axios";
+import { useEffect } from "react";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useClientSettings();
   const [profileSettings, setProfileSettings] = useProfileSettings();
   const router = useRouter();
+  const params = useSearchParams();
 
   return (
     <div>
@@ -26,7 +28,10 @@ export default function SettingsPage() {
       >
         <ChevronLeftCircle />
       </Button>
-      <Tabs className="mx-auto mt-3" defaultValue="client">
+      <Tabs
+        className="mx-auto mt-3"
+        defaultValue={params.get("tab") || "client"}
+      >
         <TabsList className="mx-auto">
           <TabsTrigger value="client">Client Settings</TabsTrigger>
           <TabsTrigger value="profile">Profile Settings</TabsTrigger>

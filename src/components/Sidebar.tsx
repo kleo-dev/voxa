@@ -41,6 +41,7 @@ export default function AppSidebar({
   setMessages,
   onNewMessage,
   setUser,
+  server,
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
@@ -50,10 +51,10 @@ export default function AppSidebar({
   chatWith?: string;
   children?: React.ReactNode;
   setUser?: React.Dispatch<React.SetStateAction<User | undefined>>;
+  server?: Server | undefined;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
-  const [server, setServer] = useState<Server | undefined>();
   const router = useRouter();
   const user = useUser();
   const [userList, setUserList] = useState<StringMap<User>>({});
@@ -225,16 +226,21 @@ export default function AppSidebar({
                 </>
               ) : (
                 <>
-                  <DMItem name="Alice" status="online" />
-                  <DMItem name="Bob" status="offline" />
-                  <DMItem name="Charlie" status="away" />
+                  <DMItem name="Alice" status="online" avatar="" />
+                  <DMItem name="Bob" status="offline" avatar="" />
+                  <DMItem name="Charlie" status="away" avatar="" />
                 </>
               )}
             </div>
           </ScrollArea>
 
           <footer className="mt-auto pb-3 pl-3 pr-3">
-            <DMItem name={user?.username || "Loading.."} status="online" />
+            <DMItem
+              name={user?.display_name || "Loading.."}
+              avatar={user?.avatar_url || ""}
+              status="online"
+              settings
+            />
           </footer>
         </div>
       </div>
@@ -244,14 +250,34 @@ export default function AppSidebar({
   );
 }
 
-function DMItem({ name, status }: { name: string; status: string }) {
+function DMItem({
+  name,
+  avatar,
+  status,
+  settings,
+}: {
+  name: string;
+  avatar: string;
+  status: string;
+  settings?: boolean;
+}) {
+  const router = useRouter();
+
   return (
     <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
-      <ProfilePicture name={name} url="" />
+      <ProfilePicture name={name} url={avatar} />
       <div className="flex flex-col">
         <span className="text-sm font-medium">{name}</span>
         <span className="text-xs text-muted-foreground">{status}</span>
       </div>
+      {settings && (
+        <Button
+          onClick={() => router.push(`/settings?tab=profile`)}
+          className="bg-transparent text-accent-foreground hover:text-accent ml-auto w-7 h-7 p-0 flex items-center justify-center rounded-md"
+        >
+          <SettingsIcon size={16} />
+        </Button>
+      )}
     </Card>
   );
 }

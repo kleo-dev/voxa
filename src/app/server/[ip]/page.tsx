@@ -5,36 +5,30 @@ import { useParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import { Message, Server as ServerType } from "@/types/types";
-import useUser, { User } from "@/hooks/get-user";
-import { NumberMap } from "@/types/typeUtils";
+import { User } from "@/hooks/get-user";
+import { StringMap } from "@/types/typeUtils";
 import auth, { makeAddress } from "@/lib/auth";
 
 export default function Server() {
-  const { id: ip } = useParams<{ id: string }>();
+  const { ip } = useParams<{ ip: string }>();
+  const wsServerRef = useRef<WebSocket | null>(null);
+  const wsNodeRef = useRef<WebSocket | null>(null);
   const [server, setServer] = useState<undefined | ServerType>();
-  const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const { user, loading } = useUser();
-  const [userList, setUserList] = useState<NumberMap<User>>({});
+  const [userList, setUserList] = useState<StringMap<User>>({});
 
   useEffect(() => {
-    if (!ip || !user || loading) return;
-    auth(makeAddress(ip), wsRef, setServer, setMessages);
-    setUserList((prev) => {
-      prev[user.id] = user;
-      return prev;
-    });
-  }, [ip, user, loading]);
+    if (!ip) return;
+    auth(makeAddress(ip, 7080), wsServerRef, setServer, setMessages);
+  }, [ip]);
 
   return (
     <AppSidebar
-      user={user}
-      server={
-        {
-          channels: [{ id: "general", name: "General", kind: "text" }],
-          ...server,
-        } as ServerType
-      }
+      wsRef={wsNodeRef}
+      setMessages={setMessages}
+      userList={userList}
+      setUserList={setUserList}
+      server={server}
     >
       <MessageBox
         channelName="General"
@@ -44,7 +38,7 @@ export default function Server() {
           .filter((m) => m.channel_id === "general")
           .toReversed()}
         sendMessage={(message) => {
-          wsRef.current?.send(
+          wsServerRef.current?.send(
             JSON.stringify({
               type: "send_message",
               params: {
