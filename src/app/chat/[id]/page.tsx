@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import { Message } from "@/types/types";
-import useUser, { User } from "@/hooks/get-user";
-import { NumberMap, StringMap } from "@/types/typeUtils";
-import auth, { makeAddress } from "@/lib/auth";
+import { UserProfile } from "@/hooks/get-user";
+import { StringMap } from "@/types/typeUtils";
 import { useParams } from "next/navigation";
 
 // In this testing instance we are assuming that the target's node is localhost
@@ -16,8 +15,8 @@ export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [userList, setUserList] = useState<StringMap<User>>({});
-  const [user, setUser] = useState<User | undefined>();
+  const [userList, setUserList] = useState<StringMap<UserProfile>>({});
+  const [user, setUser] = useState<UserProfile | undefined>();
 
   return (
     <AppSidebar

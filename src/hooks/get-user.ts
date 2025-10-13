@@ -1,19 +1,17 @@
 "use client";
 
+import { ProfileSettings } from "@/types/settings";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export interface User {
+export interface UserProfile extends ProfileSettings {
   id: string;
-  username: string;
-  display_name: string;
-  avatar_url: string;
 }
 
 export default function useUser() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,7 +23,7 @@ export default function useUser() {
       }
 
       try {
-        const res = (await axios.get("/api/profile")).data as User;
+        const res = (await axios.get("/api/profile")).data as UserProfile;
 
         setUser(res);
       } catch {

@@ -2,14 +2,14 @@
 
 import { useRef, useState } from "react";
 import AppSidebar from "@/components/Sidebar";
-import { User } from "@/hooks/get-user";
+import { UserProfile } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfilePicture from "@/components/ProfilePicture";
 
 export default function Chat() {
   const wsRef = useRef<WebSocket | null>(null);
-  const [userList, setUserList] = useState<StringMap<User>>({});
+  const [userList, setUserList] = useState<StringMap<UserProfile>>({});
 
   return (
     <AppSidebar
