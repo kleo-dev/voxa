@@ -7,7 +7,7 @@ import AppSidebar from "@/components/Sidebar";
 import { Message, Server as ServerType } from "@/types/types";
 import { UserProfile } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
-import auth, { makeAddress } from "@/lib/auth";
+import auth from "@/lib/auth";
 
 export default function Server() {
   const { ip } = useParams<{ ip: string }>();
