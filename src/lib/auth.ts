@@ -2,10 +2,20 @@ import { Message, Server } from "@/types/types";
 import axios from "axios";
 import { Dispatch, RefObject, SetStateAction } from "react";
 
-export function makeAddress(ip: string, defaultPort = 7080) {
-  // return ip.includes(":") ? `${ip}` : `${ip}:${defaultPort}`;
+async function getIP(domain: string) {
+  const res = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
+  const data = await res.json();
+  return data.Answer[0]?.data || null;
+}
+
+export async function makeAddress(ip: string, defaultPort = 7080) {
   // Apparently wss doesn't like ports (or maybe the tunnel I'm using)
-  return ip;
+  // return ip.includes(":") ? `${ip}` : `${ip}:${defaultPort}`;
+  if (ip.match(/^\d\.\d\.\d\.\d/)) {
+    return ip;
+  }
+
+  return await getIP(ip);
 }
 
 export default async function auth(
@@ -17,7 +27,8 @@ export default async function auth(
 ) {
   console.log("Authenticating with server at:", ip);
   const server_auth = (
-    (await axios.post("/api/auth", { server_ip: ip })).data as any
+    (await axios.post("/api/auth", { server_ip: await makeAddress(ip) }))
+      .data as any
   ).token;
 
   // Open the WebSocket connection
