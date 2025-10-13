@@ -16,9 +16,8 @@ import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { NumberMap, StringMap } from "@/types/typeUtils";
-import { User } from "@/hooks/get-user";
+import { UserProfile } from "@/hooks/get-user";
 import axios from "axios";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import ProfilePicture from "./ProfilePicture";
 
 function MessageContainer({
@@ -27,14 +26,17 @@ function MessageContainer({
   setUserList,
 }: {
   message: Message;
-  userList: NumberMap<User>;
-  setUserList: React.Dispatch<React.SetStateAction<NumberMap<User>>>;
+  userList: StringMap<UserProfile>;
+  setUserList: React.Dispatch<React.SetStateAction<NumberMap<UserProfile>>>;
 }) {
   useEffect(() => {
     axios
       .get("/api/profile/", { params: { id: message.from } })
       .then((res) =>
-        setUserList((prev) => ({ ...prev, [message.from]: res.data as User }))
+        setUserList((prev) => ({
+          ...prev,
+          [message.from]: res.data as UserProfile,
+        }))
       )
       .catch(console.error);
   }, [message.from, setUserList]);
@@ -144,8 +146,8 @@ export default function MessageBox({
   channelName,
 }: {
   messages: Message[];
-  userList: NumberMap<User>;
-  setUserList: React.Dispatch<React.SetStateAction<NumberMap<User>>>;
+  userList: NumberMap<UserProfile>;
+  setUserList: React.Dispatch<React.SetStateAction<NumberMap<UserProfile>>>;
   sendMessage: (m: string) => void;
   channelName?: string;
 }) {

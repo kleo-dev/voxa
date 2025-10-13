@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import { Message, Server as ServerType } from "@/types/types";
-import { User } from "@/hooks/get-user";
+import { UserProfile } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
 import auth, { makeAddress } from "@/lib/auth";
 
@@ -15,7 +15,7 @@ export default function Server() {
   const wsNodeRef = useRef<WebSocket | null>(null);
   const [server, setServer] = useState<undefined | ServerType>();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [userList, setUserList] = useState<StringMap<User>>({});
+  const [userList, setUserList] = useState<StringMap<UserProfile>>({});
 
   useEffect(() => {
     if (!ip) return;

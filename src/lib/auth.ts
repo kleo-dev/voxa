@@ -3,7 +3,9 @@ import axios from "axios";
 import { Dispatch, RefObject, SetStateAction } from "react";
 
 export function makeAddress(ip: string, defaultPort = 7080) {
-  return ip.includes(":") ? `${ip}` : `${ip}:${defaultPort}`;
+  // return ip.includes(":") ? `${ip}` : `${ip}:${defaultPort}`;
+  // Apparently wss doesn't like ports (or maybe the tunnel I'm using)
+  return ip;
 }
 
 export default async function auth(
@@ -19,7 +21,7 @@ export default async function auth(
   ).token;
 
   // Open the WebSocket connection
-  const ws = new WebSocket(`ws://${ip}`);
+  const ws = new WebSocket(`wss://${ip}`);
   wsRef.current = ws;
 
   ws.onopen = () => {

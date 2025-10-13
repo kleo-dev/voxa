@@ -10,7 +10,7 @@ import { ProfileSettings } from "@/types/settings";
 export async function POST(req: NextRequest) {
   const url = new URL(req.url);
   const token = req.cookies.get("token")?.value;
-  const { username, display_name, avatar_url } =
+  const { username, display_name, avatar_url, node_address } =
     (await req.json()) as ProfileSettings;
 
   if (!token)
@@ -21,7 +21,10 @@ export async function POST(req: NextRequest) {
 
   if (!username || !display_name || !avatar_url)
     return NextResponse.json(
-      { message: "Invalid body, requires username, display_name, avatar_url" },
+      {
+        message:
+          "Invalid body, requires username, display_name, avatar_url, node_address",
+      },
       { status: StatusCodes.BAD_REQUEST }
     );
 
@@ -41,6 +44,7 @@ export async function POST(req: NextRequest) {
       username,
       display_name,
       avatar_url,
+      node_address,
     })
     .eq("id", user.id);
 
@@ -85,7 +89,7 @@ export async function GET(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url")
+    .select("id, username, display_name, avatar_url, node_address")
     .eq("id", user_id)
     .maybeSingle();
 

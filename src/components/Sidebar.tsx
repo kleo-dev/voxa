@@ -28,7 +28,7 @@ import { Card } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import useUser, { User } from "@/hooks/get-user";
+import useUser, { UserProfile } from "@/hooks/get-user";
 import ProfilePicture from "./ProfilePicture";
 import auth, { makeAddress } from "@/lib/auth";
 import { toast } from "sonner";
@@ -47,19 +47,18 @@ export default function AppSidebar({
   wsRef: React.RefObject<WebSocket | null>;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   onNewMessage?: (msg: Message) => void;
-  userList: StringMap<User>;
-  setUserList: React.Dispatch<React.SetStateAction<StringMap<User>>>;
+  userList: StringMap<UserProfile>;
+  setUserList: React.Dispatch<React.SetStateAction<StringMap<UserProfile>>>;
   chatWith?: string;
   children?: React.ReactNode;
-  setUser?: React.Dispatch<React.SetStateAction<User | undefined>>;
+  setUser?: React.Dispatch<React.SetStateAction<UserProfile | undefined>>;
   server?: Server | undefined;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
   const router = useRouter();
   const user = useUser();
-  const [userList, setUserList] = useState<StringMap<User>>({});
-  const ip = "192.168.100.3";
+  const [userList, setUserList] = useState<StringMap<UserProfile>>({});
 
   useEffect(() => {
     const s = Cookies.get("servers")?.split(",");
@@ -67,10 +66,10 @@ export default function AppSidebar({
   }, []);
 
   useEffect(() => {
-    if (!ip || !user) return;
+    if (!user?.node_address) return;
     if (setUser) setUser(user);
     auth(
-      makeAddress(ip, 7090),
+      makeAddress(user?.node_address, 7090),
       wsRef,
       () => {},
       setMessages,
