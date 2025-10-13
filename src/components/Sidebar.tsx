@@ -40,6 +40,7 @@ export default function AppSidebar({
   wsRef,
   setMessages,
   onNewMessage,
+  setUser,
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
@@ -48,6 +49,7 @@ export default function AppSidebar({
   setUserList: React.Dispatch<React.SetStateAction<StringMap<User>>>;
   chatWith?: string;
   children?: React.ReactNode;
+  setUser?: React.Dispatch<React.SetStateAction<User | undefined>>;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
@@ -64,6 +66,7 @@ export default function AppSidebar({
 
   useEffect(() => {
     if (!ip || !user) return;
+    if (setUser) setUser(user);
     auth(
       makeAddress(ip, 7090),
       wsRef,

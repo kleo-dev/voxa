@@ -17,6 +17,7 @@ export default function DMs() {
   const wsRef = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [userList, setUserList] = useState<StringMap<User>>({});
+  const [user, setUser] = useState<User | undefined>();
 
   return (
     <AppSidebar
@@ -25,13 +26,18 @@ export default function DMs() {
       userList={userList}
       setUserList={setUserList}
       chatWith={id}
+      setUser={setUser}
     >
       <MessageBox
         channelName={userList[id]?.display_name || id}
         userList={userList}
         setUserList={setUserList}
         messages={messages
-          .filter((m) => m.channel_id === id || m.from === id)
+          .filter(
+            (m) =>
+              (m.channel_id === id && m.from === user?.id) ||
+              (m.from === id && m.channel_id === user?.id)
+          )
           .toReversed()}
         sendMessage={(message) => {
           wsRef.current?.send(
