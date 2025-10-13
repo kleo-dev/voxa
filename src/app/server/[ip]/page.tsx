@@ -19,7 +19,7 @@ export default function Server() {
 
   useEffect(() => {
     if (!ip) return;
-    auth(makeAddress(ip, 7080), wsServerRef, setServer, setMessages);
+    auth(ip, wsServerRef, setServer, setMessages);
   }, [ip]);
 
   return (

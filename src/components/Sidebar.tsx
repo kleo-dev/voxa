@@ -69,7 +69,7 @@ export default function AppSidebar({
     if (!user?.node_address) return;
     if (setUser) setUser(user);
     auth(
-      makeAddress(user?.node_address, 7090),
+      user?.node_address,
       wsRef,
       () => {},
       setMessages,
