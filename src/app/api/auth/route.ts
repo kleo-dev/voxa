@@ -35,6 +35,8 @@ export async function GET(req: NextRequest) {
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
     "127.0.0.1";
 
+  console.log("Auth request from IP:", ip);
+
   if (auth.server_ip !== ip && ip !== "::1") {
     return NextResponse.json(
       { message: "Invalid address" },
