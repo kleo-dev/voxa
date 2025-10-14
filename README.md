@@ -1,15 +1,41 @@
+<h1 align="center">
+  <br>
+  <a href="https://vxchat.netlify.app/"><img src="./public/voxa.svg" alt="VOXA"></a>
+</h1>
+
+<h4 align="center">Chat. Connect. Collaborate.</h4>
+
+<p align="center">
+  <a href="#setup">Setup</a> •
+  <a href="#features">Features</a> •
+  <a href="#keywords">Keywords</a> •
+  <a href="#node-structure">Node Structure</a> •
+  <a href="#server-structure">Server Structure</a> •
+  <a href="#authentication-handshake">Authentication</a>
+  <!-- • <a href="#wiki">Wiki</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#credits">Credits</a> •
+  <a href="#support">Support</a> •
+  <a href="#sponsor">Sponsor</a> •
+  <a href="#license">License</a> -->
+</p>
+
 ## Setup
+
 ### Requirements
+
 - Node.Js with npm
-- Postgres DB
+- Supabase
 
 ```python
-DB_USER= # Usually related to the OS username but do your own research
-DB_HOST=localhost
-DB_PASSWORD= # Can be empty
-DB_PORT=5432 # Optional
+NEXT_PUBLIC_SUPABASE_URL=""
+SUPABASE_SERVICE_ROLE_KEY=""
 ```
 
+## Features
+
+- Private: Messages can be handled by the server / node, voxa can't access them.
+- Customizable: Customize your server with plugins, a replacement for bots.
 
 ## Keywords
 
