@@ -9,7 +9,8 @@ export default async function auth(
   setServer: Dispatch<SetStateAction<Server | undefined>>,
   setMessages: (m: Message[]) => void,
   addMessage: (m: Message) => void,
-  onNewMessage?: (m: Message) => void
+  onNewMessage?: (m: Message) => void,
+  lastMessage?: number
 ) {
   console.log("Authenticating with server id:", id);
 
@@ -30,7 +31,7 @@ export default async function auth(
       JSON.stringify({
         version: "0.0.1",
         auth_token: server_auth,
-        last_message: 0,
+        last_message: lastMessage || 0,
       })
     );
   };

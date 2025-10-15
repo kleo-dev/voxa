@@ -94,7 +94,9 @@ export default function AppSidebar({
           );
 
         if (onNewMessage) onNewMessage(m);
-      }
+      },
+      undefined,
+      messages ? messages[messages.length - 1].id : undefined
     );
     setUserList((prev) => {
       prev[user.id] = user;
