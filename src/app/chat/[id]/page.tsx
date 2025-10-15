@@ -16,13 +16,13 @@ export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const wsRef = useRef<WebSocket | null>(null);
   const messages = useMessages((s) => s.messages);
-  const setMessages = useMessages((s) => s.setMessages);
+  const addMessage = useMessages((s) => s.addMessage);
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
   const [user, setUser] = useState<UserProfile | undefined>();
 
   return (
     <AppSidebar
-      setMessages={setMessages}
+      addMessage={addMessage}
       wsRef={wsRef}
       userList={userList}
       setUserList={setUserList}
