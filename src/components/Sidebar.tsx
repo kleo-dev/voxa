@@ -338,7 +338,5 @@ function getUser(
 
   get(`/api/profile/?id=${id}`, onResponse)
     ?.then(onResponse)
-    .catch((e) => {
-      console.error(e);
-    });
+    .catch((e) => {});
 }

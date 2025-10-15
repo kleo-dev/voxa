@@ -38,7 +38,7 @@ function MessageContainer({
           [message.from]: res.data as UserProfile,
         }))
       )
-      .catch(console.error);
+      .catch(() => {});
   }, [message.from, setUserList]);
 
   return (
