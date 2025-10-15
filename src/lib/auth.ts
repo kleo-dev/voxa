@@ -1,6 +1,7 @@
 import { Message, Server } from "@/types/types";
 import axios from "axios";
 import { Dispatch, RefObject, SetStateAction } from "react";
+import { get } from "./request";
 
 export default async function auth(
   id: string,
@@ -12,8 +13,7 @@ export default async function auth(
 ) {
   console.log("Authenticating with server id:", id);
 
-  const ip = ((await axios.get(`/api/server/${id}`)).data as any)
-    .address as string;
+  const ip = ((await get(`/api/server/${id}`)).data as any).address as string;
 
   console.log("Authenticating with server at:", ip);
   const server_auth = (
