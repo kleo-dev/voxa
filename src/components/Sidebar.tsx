@@ -99,6 +99,7 @@ export default function AppSidebar({
                 label: "View",
                 onClick: () => router.push(`/chat/${m.from}`),
               },
+              position: "top-right",
             }
           );
 
