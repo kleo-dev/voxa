@@ -7,11 +7,13 @@ import { StringMap } from "@/types/typeUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfilePicture from "@/components/ProfilePicture";
 import { Message } from "@/types/types";
+import { useMessages } from "@/hooks/use-messages";
 
 export default function Chat() {
   const wsRef = useRef<WebSocket | null>(null);
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
-  const [messages, setMessages] = useState<Message[]>([]);
+  const messages = useMessages((s) => s.messages);
+  const setMessages = useMessages((s) => s.setMessages);
 
   return (
     <AppSidebar

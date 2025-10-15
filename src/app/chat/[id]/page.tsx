@@ -7,6 +7,7 @@ import { Message } from "@/types/types";
 import { UserProfile } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
 import { useParams } from "next/navigation";
+import { useMessages } from "@/hooks/use-messages";
 
 // In this testing instance we are assuming that the target's node is localhost
 // To make this functional we need to add a settings feature to the api
@@ -14,7 +15,8 @@ import { useParams } from "next/navigation";
 export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const wsRef = useRef<WebSocket | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const messages = useMessages((s) => s.messages);
+  const setMessages = useMessages((s) => s.setMessages);
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
   const [user, setUser] = useState<UserProfile | undefined>();
 

@@ -34,6 +34,7 @@ import { StringMap } from "@/types/typeUtils";
 import SettingsDialog from "./settings/SettingsDialog";
 import Link from "next/link";
 import axios from "axios";
+import { get, Response } from "@/lib/request";
 
 export default function AppSidebar({
   children,
@@ -47,7 +48,7 @@ export default function AppSidebar({
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
   messages?: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  setMessages: (m: Message[]) => void;
   onNewMessage?: (msg: Message) => void;
   userList: StringMap<UserProfile>;
   setUserList: React.Dispatch<React.SetStateAction<StringMap<UserProfile>>>;
@@ -327,15 +328,15 @@ function getUser(
 ) {
   if (userList[id]) return userList[id];
 
-  axios
-    .get(`/api/profile/?id=${id}`)
-    ?.then((res) => {
-      console.log("Fetched user", res.data);
-      setUserList((prev) => {
-        prev[id] = res.data as UserProfile;
-        return prev;
-      });
-    })
+  const onResponse = (res: Response<UserProfile>) => {
+    setUserList((prev) => {
+      prev[id] = res.data as UserProfile;
+      return prev;
+    });
+  };
+
+  get(`/api/profile/?id=${id}`, onResponse)
+    ?.then(onResponse)
     .catch((e) => {
       console.error(e);
     });
