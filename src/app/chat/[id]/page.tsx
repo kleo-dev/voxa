@@ -14,13 +14,11 @@ export default function DMs() {
       <MessageBox
         app={app}
         channelName={app.profiles[id]?.display_name || id}
-        messages={app.messages
-          .filter(
-            (m) =>
-              (m.channel_id === id && m.from === app.profile?.id) ||
-              (m.from === id && m.channel_id === app.profile?.id)
-          )
-          .toReversed()}
+        messages={app.messages.filter(
+          (m) =>
+            (m.channel_id === id && m.from === app.profile?.id) ||
+            (m.from === id && m.channel_id === app.profile?.id)
+        )}
         sendMessage={(message) => {
           app.node.current?.send(
             JSON.stringify({

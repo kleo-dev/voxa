@@ -18,7 +18,6 @@ import remarkGfm from "remark-gfm";
 import { UserProfile } from "@/hooks/get-user";
 import axios from "axios";
 import ProfilePicture from "./ProfilePicture";
-import { ScrollArea } from "./ui/scroll-area";
 import App from "@/types/app";
 
 function MessageContainer({ message, app }: { message: Message; app: App }) {
@@ -145,7 +144,7 @@ export default function MessageBox({
   const [text, setText] = useState("");
 
   return (
-    <div className="h-full w-full max-h-svh flex flex-col pb-5 pl-5 gap-5">
+    <div className="h-svh w-full max-h-svh flex flex-col pb-5 pl-5 gap-5">
       {channelName && (
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
           <span
@@ -157,12 +156,12 @@ export default function MessageBox({
           </span>
         </header>
       )}
-      <ScrollArea className="w-full h-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse">
-        {messages.map((msg) => (
+      <div className="flex flex-col-reverse overflow-y-scroll">
+        {messages.toReversed().map((msg) => (
           <MessageContainer key={msg.id} message={msg} app={app} />
         ))}
-      </ScrollArea>
-      <footer className="w-full flex gap-3 pr-5 mt-auto">
+      </div>
+      <footer className="flex gap-3 pr-5 w-full mt-auto">
         <Input
           className=""
           placeholder="Type a message..."

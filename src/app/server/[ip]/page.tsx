@@ -28,8 +28,7 @@ export default function Server() {
         app={app}
         channelName="General"
         messages={app.messages
-          .filter((m) => m.channel_id === "general")
-          .toReversed()}
+          .filter((m) => m.channel_id === "general")}
         sendMessage={(message) => {
           serverRef.current?.send(
             JSON.stringify({
