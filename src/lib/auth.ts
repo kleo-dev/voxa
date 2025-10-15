@@ -6,7 +6,8 @@ export default async function auth(
   id: string,
   wsRef: RefObject<WebSocket | null>,
   setServer: Dispatch<SetStateAction<Server | undefined>>,
-  setMessages: Dispatch<SetStateAction<Message[]>>,
+  setMessages: (m: Message[]) => void,
+  addMessage: (m: Message) => void,
   onNewMessage?: (m: Message) => void
 ) {
   console.log("Authenticating with server id:", id);
@@ -50,7 +51,7 @@ export default async function auth(
 
       case "message_create":
         if (onNewMessage) onNewMessage(data.params as Message);
-        setMessages((prev) => [...prev, data.params]);
+        addMessage(data.params as Message);
         break;
     }
   };

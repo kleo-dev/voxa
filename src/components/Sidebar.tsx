@@ -47,7 +47,7 @@ export default function AppSidebar({
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
   messages?: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  setMessages: (m: Message[]) => void;
   onNewMessage?: (msg: Message) => void;
   userList: StringMap<UserProfile>;
   setUserList: React.Dispatch<React.SetStateAction<StringMap<UserProfile>>>;
