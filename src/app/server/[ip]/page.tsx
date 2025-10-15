@@ -21,13 +21,7 @@ export default function Server() {
 
   useEffect(() => {
     if (!ip) return;
-    auth(
-      ip,
-      wsServerRef,
-      setServer,
-      (ms) => ms.forEach(addMessage),
-      addMessage
-    );
+    auth(ip, wsServerRef, setServer, addMessage);
   }, [ip]);
 
   return (
