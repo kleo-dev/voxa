@@ -64,7 +64,11 @@ export default function AppSidebar({
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
 
   const dms = Array.from(
-    new Set(messages?.flatMap((item) => [item.from, item.channel_id]) || [])
+    new Set(
+      messages
+        ?.flatMap((item) => [item.from, item.channel_id])
+        .filter((item) => item !== user?.id) || []
+    )
   );
 
   useEffect(() => {
@@ -280,12 +284,10 @@ function DMItem({
   status: string;
   settings?: boolean;
 }) {
-  const router = useRouter();
-
   return (
     <Link
-      href={`/chat/${id}`}
-      className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent"
+      href={settings ? "" : `/chat/${id}`}
+      className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent rounded-md"
     >
       <ProfilePicture name={name} url={avatar} />
       <div className="flex flex-col">
