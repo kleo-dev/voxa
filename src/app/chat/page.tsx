@@ -6,24 +6,27 @@ import { UserProfile } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfilePicture from "@/components/ProfilePicture";
+import { Message } from "@/types/types";
 
 export default function Chat() {
   const wsRef = useRef<WebSocket | null>(null);
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
+  const [messages, setMessages] = useState<Message[]>([]);
 
   return (
     <AppSidebar
       wsRef={wsRef}
       userList={userList}
       setUserList={setUserList}
-      setMessages={() => {}}
+      setMessages={setMessages}
+      messages={messages}
     >
       <Card className="bg-background w-full">
         <CardHeader>
           <CardTitle>Direct Messages</CardTitle>
         </CardHeader>
         <CardContent>
-          <DMItem name="Alice" status="online" avatar="" />
+          {/* <DMItem name="Alice" status="online" avatar="" /> */}
         </CardContent>
       </Card>
     </AppSidebar>

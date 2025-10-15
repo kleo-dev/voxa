@@ -32,6 +32,8 @@ import auth from "@/lib/auth";
 import { toast } from "sonner";
 import { StringMap } from "@/types/typeUtils";
 import SettingsDialog from "./settings/SettingsDialog";
+import Link from "next/link";
+import axios from "axios";
 
 export default function AppSidebar({
   children,
@@ -41,8 +43,10 @@ export default function AppSidebar({
   onNewMessage,
   setUser,
   server,
+  messages,
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
+  messages?: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   onNewMessage?: (msg: Message) => void;
   userList: StringMap<UserProfile>;
@@ -57,6 +61,10 @@ export default function AppSidebar({
   const router = useRouter();
   const user = useUser();
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
+
+  const dms = Array.from(
+    new Set(messages?.flatMap((item) => [item.from, item.channel_id]) || [])
+  );
 
   useEffect(() => {
     const s = Cookies.get("servers")?.split(",");
@@ -222,9 +230,19 @@ export default function AppSidebar({
                 </>
               ) : (
                 <>
-                  <DMItem name="Alice" status="online" avatar="" />
-                  <DMItem name="Bob" status="offline" avatar="" />
-                  <DMItem name="Charlie" status="away" avatar="" />
+                  {dms.map((id) => (
+                    <DMItem
+                      name={
+                        getUser(id, userList, setUserList)?.display_name || id
+                      }
+                      id={id}
+                      status="online"
+                      avatar={
+                        getUser(id, userList, setUserList)?.avatar_url || ""
+                      }
+                      key={id}
+                    />
+                  ))}
                 </>
               )}
             </div>
@@ -233,6 +251,7 @@ export default function AppSidebar({
           <footer className="mt-auto pb-3 pl-3 pr-3">
             <DMItem
               name={user?.display_name || "Loading.."}
+              id={user?.id || "me"}
               avatar={user?.avatar_url || ""}
               status="online"
               settings
@@ -248,11 +267,13 @@ export default function AppSidebar({
 
 function DMItem({
   name,
+  id,
   avatar,
   status,
   settings,
 }: {
   name: string;
+  id: string;
   avatar: string;
   status: string;
   settings?: boolean;
@@ -260,7 +281,10 @@ function DMItem({
   const router = useRouter();
 
   return (
-    <Card className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent">
+    <Link
+      href={`/chat/${id}`}
+      className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent"
+    >
       <ProfilePicture name={name} url={avatar} />
       <div className="flex flex-col">
         <span className="text-sm font-medium">{name}</span>
@@ -272,7 +296,7 @@ function DMItem({
           tab="profile"
         />
       )}
-    </Card>
+    </Link>
   );
 }
 
@@ -294,4 +318,25 @@ function ChannelIcon({ kind }: { kind: "text" | "voice" }) {
     default:
       return null;
   }
+}
+
+function getUser(
+  id: string,
+  userList: StringMap<UserProfile>,
+  setUserList: React.Dispatch<React.SetStateAction<StringMap<UserProfile>>>
+) {
+  if (userList[id]) return userList[id];
+
+  axios
+    .get(`/api/profile/?id=${id}`)
+    ?.then((res) => {
+      console.log("Fetched user", res.data);
+      setUserList((prev) => {
+        prev[id] = res.data as UserProfile;
+        return prev;
+      });
+    })
+    .catch((e) => {
+      console.error(e);
+    });
 }

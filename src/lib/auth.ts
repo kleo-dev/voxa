@@ -15,8 +15,9 @@ export default async function auth(
     .address as string;
 
   console.log("Authenticating with server at:", ip);
-  const server_auth = ((await axios.post("/api/auth", { server_id: id })).data as any)
-    .token;
+  const server_auth = (
+    (await axios.post("/api/auth", { server_id: id })).data as any
+  ).token;
 
   // Open the WebSocket connection
   const ws = new WebSocket(`wss://${ip}`);

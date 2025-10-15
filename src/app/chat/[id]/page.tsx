@@ -26,6 +26,7 @@ export default function DMs() {
       setUserList={setUserList}
       chatWith={id}
       setUser={setUser}
+      messages={messages}
     >
       <MessageBox
         channelName={userList[id]?.display_name || id}
