@@ -128,26 +128,10 @@ export default function AppSidebar({
 
   return (
     <div className="flex h-screen">
-      {open && (
-        <div
-          className="absolute h-screen w-screen"
-          onClick={() => setOpen(false)}
-        />
-      )}
-      {/* <div
-        className={cn(
-          "flex h-screen border-r absolute md:static z-50 transform transition-transform duration-300 ease-in-out",
-          open ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0",
-          "md:static md:translate-x-0 md:opacity-100 pointer-events-none"
-        )}
-      > */}
       <div
         className={cn(
-          "flex h-screen border-r transform transition-transform duration-300 ease-in-out",
-          open
-            ? "translate-x-0 opacity-100"
-            : "-translate-x-full opacity-0 absolute",
-          "md:static md:translate-x-0 md:opacity-100 pointer-events-none"
+          "border-r transition-all duration-300 ease-in-out overflow-hidden flex",
+          open ? "w-md" : "w-0 md:w-md"
         )}
       >
         <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
@@ -238,7 +222,7 @@ export default function AppSidebar({
         </div>
 
         {/* Right column */}
-        <div className="w-64 flex flex-col bg-card">
+        <div className="w-full flex flex-col bg-card">
           {server ? (
             <div className="p-3 border-b flex items-center gap-2">
               <h2>{server.name}</h2>
@@ -292,7 +276,10 @@ export default function AppSidebar({
         </div>
       </div>
       {open ? (
-        <div className="w-screen h-full overflow-x-hidden">
+        <div
+          className="w-screen h-full overflow-x-hidden"
+          onClick={() => setOpen(false)}
+        >
           <div className="overflow-x-hidden w-screen min-w-max flex-shrink-0">
             {children}
           </div>
