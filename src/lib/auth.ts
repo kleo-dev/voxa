@@ -7,7 +7,6 @@ export default async function auth(
   id: string,
   wsRef: RefObject<WebSocket | null>,
   setServer: Dispatch<SetStateAction<Server | undefined>>,
-  setMessages: (m: Message[]) => void,
   addMessage: (m: Message) => void,
   onNewMessage?: (m: Message) => void,
   lastMessage?: number
@@ -47,7 +46,7 @@ export default async function auth(
 
     switch (data.type) {
       case "authenticated":
-        setMessages(data.params.messages);
+        data.params.messages.forEach(addMessage);
         break;
 
       case "message_create":
