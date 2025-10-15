@@ -127,7 +127,7 @@ export default function AppSidebar({
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-svh md:h-screen">
       <div
         className={cn(
           "border-r transition-all duration-300 ease-in-out overflow-hidden flex",

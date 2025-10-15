@@ -156,7 +156,7 @@ export default function MessageBox({
   const [text, setText] = useState("");
 
   return (
-    <div className="h-screen w-full flex flex-col pb-5 pl-5 gap-5">
+    <div className="h-full w-full flex flex-col pb-5 pl-5 gap-5">
       {channelName && (
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
           <span onClick={toggleSidebar} className="cursor-pointer flex">
@@ -165,7 +165,7 @@ export default function MessageBox({
           </span>
         </header>
       )}
-      <div className="w-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse pr-5">
+      <div className="w-full h-max flex-1 overflow-y-scroll flex gap-2 flex-col-reverse pr-5">
         {messages.map((msg) => (
           <MessageContainer
             key={msg.id}
@@ -175,7 +175,7 @@ export default function MessageBox({
           />
         ))}
       </div>
-      <div className="w-full flex gap-3 pr-5">
+      <footer className="w-full flex gap-3 pr-5 mt-auto">
         <Input
           className=""
           placeholder="Type a message..."
@@ -202,7 +202,7 @@ export default function MessageBox({
             />
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </footer>
     </div>
   );
 }
