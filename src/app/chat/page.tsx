@@ -13,14 +13,14 @@ export default function Chat() {
   const wsRef = useRef<WebSocket | null>(null);
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
   const messages = useMessages((s) => s.messages);
-  const setMessages = useMessages((s) => s.setMessages);
+  const addMessage = useMessages((s) => s.addMessage);
 
   return (
     <AppSidebar
       wsRef={wsRef}
       userList={userList}
       setUserList={setUserList}
-      setMessages={setMessages}
+      addMessage={addMessage}
       messages={messages}
     >
       <Card className="bg-background w-full">

@@ -40,15 +40,15 @@ export default function AppSidebar({
   children,
   chatWith,
   wsRef,
-  setMessages,
   onNewMessage,
   setUser,
   server,
   messages,
+  addMessage,
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
+  addMessage: (msg: Message) => void;
   messages?: Message[];
-  setMessages: (m: Message[]) => void;
   onNewMessage?: (msg: Message) => void;
   userList: StringMap<UserProfile>;
   setUserList: React.Dispatch<React.SetStateAction<StringMap<UserProfile>>>;
@@ -79,7 +79,7 @@ export default function AppSidebar({
       user?.node_address,
       wsRef,
       () => {},
-      setMessages,
+      (ms) => ms.forEach(addMessage),
       (m) => {
         if (m.from !== chatWith && m.from !== user.id)
           toast(

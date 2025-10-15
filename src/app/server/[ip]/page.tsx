@@ -8,26 +8,32 @@ import { Message, Server as ServerType } from "@/types/types";
 import { UserProfile } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
 import auth from "@/lib/auth";
+import { useMessages } from "@/hooks/use-messages";
 
 export default function Server() {
   const { ip } = useParams<{ ip: string }>();
   const wsServerRef = useRef<WebSocket | null>(null);
   const wsNodeRef = useRef<WebSocket | null>(null);
   const [server, setServer] = useState<undefined | ServerType>();
-  const [messages, setMessages] = useState<Message[]>([]);
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
+  const messages = useMessages((s) => s.messages);
+  const addMessage = useMessages((s) => s.addMessage);
 
   useEffect(() => {
     if (!ip) return;
-    auth(ip, wsServerRef, setServer, setMessages, (m) => {
-      setMessages((prev) => [...prev, m]);
-    });
+    auth(
+      ip,
+      wsServerRef,
+      setServer,
+      (ms) => ms.forEach(addMessage),
+      addMessage
+    );
   }, [ip]);
 
   return (
     <AppSidebar
       wsRef={wsNodeRef}
-      setMessages={setMessages}
+      addMessage={() => {}}
       userList={userList}
       setUserList={setUserList}
       server={server}
