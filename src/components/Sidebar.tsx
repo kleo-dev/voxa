@@ -131,7 +131,7 @@ export default function AppSidebar({
       <div
         className={cn(
           "border-r transition-all duration-300 ease-in-out overflow-hidden flex",
-          open ? "w-md" : "w-0 md:w-md"
+          open ? "w-5xl md:w-md" : "w-0 md:w-md"
         )}
       >
         <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
