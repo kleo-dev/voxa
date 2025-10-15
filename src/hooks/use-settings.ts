@@ -2,6 +2,7 @@
 
 import { defaultSettings, getClientSettings } from "@/lib/clientSettings";
 import { ProfileSettings, ClientSettings } from "@/types/settings";
+import axios from "axios";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export function useClientSettings(): [
@@ -31,11 +32,8 @@ export function useProfileSettings(): [
   useEffect(() => {
     async function fetchProfileSettings() {
       try {
-        const res = await fetch("/api/profile");
-        if (res.ok) {
-          const data = (await res.json()) as ProfileSettings;
-          setSettings(data);
-        }
+        const res = await axios.get("/api/profile");
+        setSettings(res.data as ProfileSettings);
       } catch (error) {
         console.error("Failed to fetch profile settings:", error);
       }

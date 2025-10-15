@@ -14,9 +14,12 @@ export default function Chat() {
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
   const messages = useMessages((s) => s.messages);
   const addMessage = useMessages((s) => s.addMessage);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <AppSidebar
+      open={sidebarOpen}
+      setOpen={setSidebarOpen}
       wsRef={wsRef}
       userList={userList}
       setUserList={setUserList}

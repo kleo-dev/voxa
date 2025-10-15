@@ -26,13 +26,6 @@ export default async function auth(
 
   ws.onopen = () => {
     console.log("Connected to WebSocket:", ip);
-    ws.send(
-      JSON.stringify({
-        version: "0.0.1",
-        auth_token: server_auth,
-        last_message: lastMessage || 0,
-      })
-    );
   };
 
   ws.onmessage = (m) => {
@@ -41,6 +34,13 @@ export default async function auth(
 
     if (data.version) {
       setServer({ channels: [], ...data });
+      ws.send(
+        JSON.stringify({
+          version: "0.0.1",
+          auth_token: server_auth,
+          last_message: lastMessage || 0,
+        })
+      );
       return;
     }
 

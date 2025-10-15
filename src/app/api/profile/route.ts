@@ -84,14 +84,26 @@ export async function GET(req: NextRequest) {
   if (!user_id)
     return NextResponse.json(
       { message: "Invalid token" },
-      { status: StatusCodes.NOT_FOUND }
+      { status: StatusCodes.BAD_REQUEST }
     );
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("id, username, display_name, avatar_url, node_address")
     .eq("id", user_id)
     .maybeSingle();
+
+  if (error)
+    return NextResponse.json(
+      { message: error.message },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
+
+  if (!profile)
+    return NextResponse.json(
+      { message: "Profile not found" },
+      { status: StatusCodes.NOT_FOUND }
+    );
 
   return NextResponse.json({ message: "ok", ...profile });
 }

@@ -35,6 +35,7 @@ import SettingsDialog from "./settings/SettingsDialog";
 import Link from "next/link";
 import axios from "axios";
 import { get, Response } from "@/lib/request";
+import { cn } from "@/lib/utils";
 
 export default function AppSidebar({
   children,
@@ -45,6 +46,8 @@ export default function AppSidebar({
   server,
   messages,
   addMessage,
+  open,
+  setOpen,
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
   addMessage: (msg: Message) => void;
@@ -56,6 +59,8 @@ export default function AppSidebar({
   children?: React.ReactNode;
   setUser?: React.Dispatch<React.SetStateAction<UserProfile | undefined>>;
   server?: Server | undefined;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
@@ -64,7 +69,11 @@ export default function AppSidebar({
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
 
   const dms = Array.from(
-    new Set(messages?.flatMap((item) => [item.from, item.channel_id]) || [])
+    new Set(
+      messages
+        ?.flatMap((item) => [item.from, item.channel_id])
+        .filter((item) => item !== user?.id) || []
+    )
   );
 
   useEffect(() => {
@@ -90,6 +99,7 @@ export default function AppSidebar({
                 label: "View",
                 onClick: () => router.push(`/chat/${m.from}`),
               },
+              position: "top-right",
             }
           );
 
@@ -118,8 +128,13 @@ export default function AppSidebar({
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="h-screen flex border-r">
+    <div className="flex h-svh md:h-screen">
+      <div
+        className={cn(
+          "border-r transition-all duration-300 ease-in-out overflow-hidden flex",
+          open ? "w-5xl md:w-md" : "w-0 md:w-md"
+        )}
+      >
         <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
           <Button
             onClick={() => router.push(`/chat`)}
@@ -208,7 +223,7 @@ export default function AppSidebar({
         </div>
 
         {/* Right column */}
-        <div className="w-64 flex flex-col bg-card">
+        <div className="w-full flex flex-col bg-card">
           {server ? (
             <div className="p-3 border-b flex items-center gap-2">
               <h2>{server.name}</h2>
@@ -261,8 +276,18 @@ export default function AppSidebar({
           </footer>
         </div>
       </div>
-
-      {children}
+      {open ? (
+        <div
+          className="w-screen h-full overflow-x-hidden"
+          onClick={() => setOpen(false)}
+        >
+          <div className="overflow-x-hidden w-screen min-w-max flex-shrink-0">
+            {children}
+          </div>
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 }
@@ -280,12 +305,10 @@ function DMItem({
   status: string;
   settings?: boolean;
 }) {
-  const router = useRouter();
-
   return (
     <Link
-      href={`/chat/${id}`}
-      className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent"
+      href={settings ? "" : `/chat/${id}`}
+      className="p-2 flex flex-row items-center gap-2 cursor-pointer hover:bg-accent rounded-md"
     >
       <ProfilePicture name={name} url={avatar} />
       <div className="flex flex-col">
@@ -338,7 +361,5 @@ function getUser(
 
   get(`/api/profile/?id=${id}`, onResponse)
     ?.then(onResponse)
-    .catch((e) => {
-      console.error(e);
-    });
+    .catch((e) => {});
 }
