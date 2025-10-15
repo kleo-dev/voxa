@@ -10,53 +10,45 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ChevronLeft, ChevronLeftIcon, SmilePlusIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ChevronLeftIcon, SmilePlusIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { NumberMap, StringMap } from "@/types/typeUtils";
 import { UserProfile } from "@/hooks/get-user";
 import axios from "axios";
 import ProfilePicture from "./ProfilePicture";
+import App from "@/types/app";
 
-function MessageContainer({
-  message,
-  userList,
-  setUserList,
-}: {
-  message: Message;
-  userList: StringMap<UserProfile>;
-  setUserList: React.Dispatch<React.SetStateAction<NumberMap<UserProfile>>>;
-}) {
+function MessageContainer({ message, app }: { message: Message; app: App }) {
   useEffect(() => {
     axios
       .get("/api/profile/", { params: { id: message.from } })
       .then((res) =>
-        setUserList((prev) => ({
+        app.setProfiles((prev) => ({
           ...prev,
           [message.from]: res.data as UserProfile,
         }))
       )
       .catch(() => {});
-  }, [message.from, setUserList]);
+  }, [message.from]);
 
   return (
     <div className="flex flex-col gap-3 rounded-lg p-4 hover:bg-accent">
       <div className="flex gap-2">
         {/* <div className="w-8 h-8 rounded-full bg-gray-400" /> */}
         <ProfilePicture
-          url={userList[message.from]?.avatar_url}
+          url={app.profiles[message.from]?.avatar_url}
           name={String(
-            userList[message.from]
-              ? userList[message.from].display_name
+            app.profiles[message.from]
+              ? app.profiles[message.from].display_name
               : message.from
           )}
         />
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
-            {userList[message.from]
-              ? userList[message.from].display_name
+            {app.profiles[message.from]
+              ? app.profiles[message.from].display_name
               : message.from}
 
             <p className="text-neutral-500 text-xs">
@@ -139,43 +131,37 @@ function MessageContainer({
 }
 
 export default function MessageBox({
-  messages,
-  userList,
-  setUserList,
+  app,
   sendMessage,
   channelName,
-  toggleSidebar,
+  messages,
 }: {
-  messages: Message[];
-  userList: NumberMap<UserProfile>;
-  setUserList: React.Dispatch<React.SetStateAction<NumberMap<UserProfile>>>;
+  app: App;
   sendMessage: (m: string) => void;
   channelName?: string;
-  toggleSidebar: () => void;
+  messages: Message[];
 }) {
   const [text, setText] = useState("");
 
   return (
-    <div className="h-full w-full flex flex-col pb-5 pl-5 gap-5">
+    <div className="h-svh w-full max-h-svh flex flex-col pb-5 pl-5 gap-5">
       {channelName && (
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
-          <span onClick={toggleSidebar} className="cursor-pointer flex">
+          <span
+            onClick={() => app.setSidebarOpen(true)}
+            className="cursor-pointer flex"
+          >
             <ChevronLeftIcon className="w-5 h-5" />
             {channelName}
           </span>
         </header>
       )}
-      <div className="w-full h-max flex-1 overflow-y-scroll flex gap-2 flex-col-reverse pr-5">
-        {messages.map((msg) => (
-          <MessageContainer
-            key={msg.id}
-            message={msg}
-            userList={userList}
-            setUserList={setUserList}
-          />
+      <div className="flex flex-col-reverse overflow-y-scroll">
+        {messages.toReversed().map((msg) => (
+          <MessageContainer key={msg.id} message={msg} app={app} />
         ))}
       </div>
-      <footer className="w-full flex gap-3 pr-5 mt-auto">
+      <footer className="flex gap-3 pr-5 w-full mt-auto">
         <Input
           className=""
           placeholder="Type a message..."
