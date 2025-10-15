@@ -10,7 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { SmilePlusIcon } from "lucide-react";
+import { ChevronLeft, ChevronLeftIcon, SmilePlusIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
@@ -144,12 +144,14 @@ export default function MessageBox({
   setUserList,
   sendMessage,
   channelName,
+  toggleSidebar,
 }: {
   messages: Message[];
   userList: NumberMap<UserProfile>;
   setUserList: React.Dispatch<React.SetStateAction<NumberMap<UserProfile>>>;
   sendMessage: (m: string) => void;
   channelName?: string;
+  toggleSidebar: () => void;
 }) {
   const [text, setText] = useState("");
 
@@ -157,7 +159,10 @@ export default function MessageBox({
     <div className="h-screen w-full flex flex-col pb-5 pl-5 gap-5">
       {channelName && (
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
-          {channelName}
+          <span onClick={toggleSidebar} className="cursor-pointer flex">
+            <ChevronLeftIcon className="w-5 h-5" />
+            {channelName}
+          </span>
         </header>
       )}
       <div className="w-full flex-1 overflow-y-scroll flex gap-2 flex-col-reverse pr-5">

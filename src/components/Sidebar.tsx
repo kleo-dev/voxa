@@ -35,6 +35,7 @@ import SettingsDialog from "./settings/SettingsDialog";
 import Link from "next/link";
 import axios from "axios";
 import { get, Response } from "@/lib/request";
+import { cn } from "@/lib/utils";
 
 export default function AppSidebar({
   children,
@@ -45,6 +46,8 @@ export default function AppSidebar({
   server,
   messages,
   addMessage,
+  open,
+  setOpen,
 }: Readonly<{
   wsRef: React.RefObject<WebSocket | null>;
   addMessage: (msg: Message) => void;
@@ -56,6 +59,8 @@ export default function AppSidebar({
   children?: React.ReactNode;
   setUser?: React.Dispatch<React.SetStateAction<UserProfile | undefined>>;
   server?: Server | undefined;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
@@ -123,7 +128,28 @@ export default function AppSidebar({
 
   return (
     <div className="flex h-screen">
-      <div className="h-screen flex border-r">
+      {open && (
+        <div
+          className="absolute h-screen w-screen"
+          onClick={() => setOpen(false)}
+        />
+      )}
+      {/* <div
+        className={cn(
+          "flex h-screen border-r absolute md:static z-50 transform transition-transform duration-300 ease-in-out",
+          open ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0",
+          "md:static md:translate-x-0 md:opacity-100 pointer-events-none"
+        )}
+      > */}
+      <div
+        className={cn(
+          "flex h-screen border-r transform transition-transform duration-300 ease-in-out",
+          open
+            ? "translate-x-0 opacity-100"
+            : "-translate-x-full opacity-0 absolute",
+          "md:static md:translate-x-0 md:opacity-100 pointer-events-none"
+        )}
+      >
         <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
           <Button
             onClick={() => router.push(`/chat`)}
@@ -265,8 +291,15 @@ export default function AppSidebar({
           </footer>
         </div>
       </div>
-
-      {children}
+      {open ? (
+        <div className="w-screen h-full overflow-x-hidden">
+          <div className="overflow-x-hidden w-screen min-w-max flex-shrink-0">
+            {children}
+          </div>
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 }

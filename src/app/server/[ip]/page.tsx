@@ -18,6 +18,7 @@ export default function Server() {
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
   const messages = useMessages((s) => s.messages);
   const addMessage = useMessages((s) => s.addMessage);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!ip) return;
@@ -26,6 +27,8 @@ export default function Server() {
 
   return (
     <AppSidebar
+      open={sidebarOpen}
+      setOpen={setSidebarOpen}
       wsRef={wsNodeRef}
       addMessage={() => {}}
       userList={userList}
@@ -33,6 +36,7 @@ export default function Server() {
       server={server}
     >
       <MessageBox
+        toggleSidebar={() => setSidebarOpen(true)}
         channelName="General"
         userList={userList}
         setUserList={setUserList}

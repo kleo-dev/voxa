@@ -9,9 +9,6 @@ import { StringMap } from "@/types/typeUtils";
 import { useParams } from "next/navigation";
 import { useMessages } from "@/hooks/use-messages";
 
-// In this testing instance we are assuming that the target's node is localhost
-// To make this functional we need to add a settings feature to the api
-
 export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const wsRef = useRef<WebSocket | null>(null);
@@ -19,9 +16,12 @@ export default function DMs() {
   const addMessage = useMessages((s) => s.addMessage);
   const [userList, setUserList] = useState<StringMap<UserProfile>>({});
   const [user, setUser] = useState<UserProfile | undefined>();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <AppSidebar
+      open={sidebarOpen}
+      setOpen={setSidebarOpen}
       addMessage={addMessage}
       wsRef={wsRef}
       userList={userList}
@@ -31,6 +31,7 @@ export default function DMs() {
       messages={messages}
     >
       <MessageBox
+        toggleSidebar={() => setSidebarOpen(true)}
         channelName={userList[id]?.display_name || id}
         userList={userList}
         setUserList={setUserList}
