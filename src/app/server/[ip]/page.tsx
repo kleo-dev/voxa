@@ -25,10 +25,8 @@ export default function Server() {
   return (
     <AppSidebar app={app} server={server}>
       <MessageBox
-        toggleSidebar={() => app.setSidebarOpen(true)}
+        app={app}
         channelName="General"
-        userList={app.profiles}
-        setUserList={app.setProfiles}
         messages={app.messages
           .filter((m) => m.channel_id === "general")
           .toReversed()}

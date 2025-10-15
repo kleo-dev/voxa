@@ -265,10 +265,10 @@ export default function AppSidebar({
       </div>
       {app.sidebarOpen ? (
         <div
-          className="w-screen h-full overflow-x-hidden"
+          className="w-full h-full overflow-x-hidden"
           onClick={() => app.setSidebarOpen(false)}
         >
-          <div className="overflow-x-hidden w-screen min-w-max flex-shrink-0">
+          <div className="overflow-x-hidden min-w-max flex-shrink-0">
             {children}
           </div>
         </div>

@@ -12,10 +12,8 @@ export default function DMs() {
   return (
     <AppSidebar app={app}>
       <MessageBox
-        toggleSidebar={() => app.setSidebarOpen(true)}
+        app={app}
         channelName={app.profiles[id]?.display_name || id}
-        userList={app.profiles}
-        setUserList={app.setProfiles}
         messages={app.messages
           .filter(
             (m) =>
