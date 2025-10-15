@@ -26,53 +26,39 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
 import { useRouter } from "next/navigation";
-import useUser, { UserProfile } from "@/hooks/get-user";
+import { UserProfile } from "@/hooks/get-user";
 import ProfilePicture from "./ProfilePicture";
 import auth from "@/lib/auth";
 import { toast } from "sonner";
 import { StringMap } from "@/types/typeUtils";
 import SettingsDialog from "./settings/SettingsDialog";
 import Link from "next/link";
-import axios from "axios";
 import { get, Response } from "@/lib/request";
 import { cn } from "@/lib/utils";
+import App from "@/types/app";
 
 export default function AppSidebar({
   children,
   chatWith,
-  wsRef,
   onNewMessage,
-  setUser,
   server,
-  messages,
-  addMessage,
-  open,
-  setOpen,
+  app,
 }: Readonly<{
-  wsRef: React.RefObject<WebSocket | null>;
-  addMessage: (msg: Message) => void;
-  messages?: Message[];
   onNewMessage?: (msg: Message) => void;
-  userList: StringMap<UserProfile>;
-  setUserList: React.Dispatch<React.SetStateAction<StringMap<UserProfile>>>;
   chatWith?: string;
   children?: React.ReactNode;
-  setUser?: React.Dispatch<React.SetStateAction<UserProfile | undefined>>;
   server?: Server | undefined;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  app: App;
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
   const router = useRouter();
-  const user = useUser();
-  const [userList, setUserList] = useState<StringMap<UserProfile>>({});
 
   const dms = Array.from(
     new Set(
-      messages
+      app.messages
         ?.flatMap((item) => [item.from, item.channel_id])
-        .filter((item) => item !== user?.id) || []
+        .filter((item) => item !== app.profile?.id) || []
     )
   );
 
@@ -82,17 +68,16 @@ export default function AppSidebar({
   }, []);
 
   useEffect(() => {
-    if (!user?.node_address) return;
-    if (setUser) setUser(user);
+    if (!app.profile?.node_address) return;
     auth(
-      user?.node_address,
-      wsRef,
+      app.profile?.node_address,
+      app.node,
       () => {},
-      addMessage,
+      app.addMessage,
       (m) => {
-        if (m.from !== chatWith && m.from !== user.id)
+        if (m.from !== chatWith && m.from !== app.profile?.id)
           toast(
-            `New message from ${userList[m.from]?.display_name || m.from}`,
+            `New message from ${app.profiles[m.from]?.display_name || m.from}`,
             {
               description: m.contents.slice(0, 80),
               action: {
@@ -105,13 +90,13 @@ export default function AppSidebar({
 
         if (onNewMessage) onNewMessage(m);
       },
-      messages ? messages[messages.length - 1]?.id : undefined
+      app.messages ? app.messages[app.messages.length - 1]?.id : undefined
     );
-    setUserList((prev) => {
-      prev[user.id] = user;
+    app.setProfiles((prev) => {
+      if (app.profile) prev[app.profile.id] = app.profile;
       return prev;
     });
-  }, [chatWith, user]);
+  }, [chatWith, app.profile]);
 
   const handleAddServer = () => {
     if (!newServer.ip) return;
@@ -132,7 +117,7 @@ export default function AppSidebar({
       <div
         className={cn(
           "border-r transition-all duration-300 ease-in-out overflow-hidden flex",
-          open ? "w-5xl md:w-md" : "w-0 md:w-md"
+          app.sidebarOpen ? "w-5xl md:w-md" : "w-0 md:w-md"
         )}
       >
         <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
@@ -250,12 +235,14 @@ export default function AppSidebar({
                   {dms.map((id) => (
                     <DMItem
                       name={
-                        getUser(id, userList, setUserList)?.display_name || id
+                        getUser(id, app.profiles, app.setProfiles)
+                          ?.display_name || id
                       }
                       id={id}
                       status="online"
                       avatar={
-                        getUser(id, userList, setUserList)?.avatar_url || ""
+                        getUser(id, app.profiles, app.setProfiles)
+                          ?.avatar_url || ""
                       }
                       key={id}
                     />
@@ -267,19 +254,19 @@ export default function AppSidebar({
 
           <footer className="mt-auto pb-3 pl-3 pr-3">
             <DMItem
-              name={user?.display_name || "Loading.."}
-              id={user?.id || "me"}
-              avatar={user?.avatar_url || ""}
+              name={app.profile?.display_name || "Loading.."}
+              id={app.profile?.id || "me"}
+              avatar={app.profile?.avatar_url || ""}
               status="online"
               settings
             />
           </footer>
         </div>
       </div>
-      {open ? (
+      {app.sidebarOpen ? (
         <div
           className="w-screen h-full overflow-x-hidden"
-          onClick={() => setOpen(false)}
+          onClick={() => app.setSidebarOpen(false)}
         >
           <div className="overflow-x-hidden w-screen min-w-max flex-shrink-0">
             {children}

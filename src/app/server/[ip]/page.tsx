@@ -9,42 +9,31 @@ import { UserProfile } from "@/hooks/get-user";
 import { StringMap } from "@/types/typeUtils";
 import auth from "@/lib/auth";
 import { useMessages } from "@/hooks/use-messages";
+import useApp from "@/hooks/use-app";
 
 export default function Server() {
   const { ip } = useParams<{ ip: string }>();
-  const wsServerRef = useRef<WebSocket | null>(null);
-  const wsNodeRef = useRef<WebSocket | null>(null);
+  const serverRef = useRef<WebSocket | null>(null);
   const [server, setServer] = useState<undefined | ServerType>();
-  const [userList, setUserList] = useState<StringMap<UserProfile>>({});
-  const messages = useMessages((s) => s.messages);
-  const addMessage = useMessages((s) => s.addMessage);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const app = useApp();
 
   useEffect(() => {
     if (!ip) return;
-    auth(ip, wsServerRef, setServer, addMessage);
+    auth(ip, serverRef, setServer, app.addMessage);
   }, [ip]);
 
   return (
-    <AppSidebar
-      open={sidebarOpen}
-      setOpen={setSidebarOpen}
-      wsRef={wsNodeRef}
-      addMessage={() => {}}
-      userList={userList}
-      setUserList={setUserList}
-      server={server}
-    >
+    <AppSidebar app={app} server={server}>
       <MessageBox
-        toggleSidebar={() => setSidebarOpen(true)}
+        toggleSidebar={() => app.setSidebarOpen(true)}
         channelName="General"
-        userList={userList}
-        setUserList={setUserList}
-        messages={messages
+        userList={app.profiles}
+        setUserList={app.setProfiles}
+        messages={app.messages
           .filter((m) => m.channel_id === "general")
           .toReversed()}
         sendMessage={(message) => {
-          wsServerRef.current?.send(
+          serverRef.current?.send(
             JSON.stringify({
               type: "send_message",
               params: {
