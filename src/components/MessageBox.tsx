@@ -156,12 +156,12 @@ export default function MessageBox({
           </span>
         </header>
       )}
-      <div className="flex flex-col-reverse overflow-y-scroll">
+      <div className="mt-auto flex flex-col-reverse overflow-y-scroll">
         {messages.toReversed().map((msg) => (
           <MessageContainer key={msg.id} message={msg} app={app} />
         ))}
       </div>
-      <footer className="flex gap-3 pr-5 w-full mt-auto">
+      <footer className="flex gap-3 pr-5 w-full h-max">
         <Input
           className=""
           placeholder="Type a message..."
