@@ -3,13 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function CreateAccount() {
   const [username, setUsername] = useState("");
@@ -21,39 +21,7 @@ export default function CreateAccount() {
   const [feedback, setFeedback] = useState<
     undefined | { kind: "error" | "info"; message: string }
   >();
-  const [verify, setVerify] = useState<string | undefined>();
-
   const router = useRouter();
-
-  // Verify interval
-  useEffect(() => {
-    if (verify) {
-      const i = setInterval(async () => {
-        const { data } = await axios.get("/api/verify", {
-          params: { email, password },
-        });
-        const response = data as {
-          verified: boolean;
-          user_id: string;
-          access_token?: string;
-          refresh_token?: string;
-        };
-        if (response.verified) {
-          clearInterval(i);
-          setFeedback({
-            message: "Email verified, redirecting...",
-            kind: "info",
-          });
-          if (response.access_token) {
-            Cookies.set("token", response.access_token);
-            setTimeout(() => router.push("/chat"), 500);
-          } else {
-            console.log(response);
-          }
-        }
-      }, 8000);
-    }
-  }, [verify]);
 
   const validateInput = ():
     | { kind: "error" | "info"; message: string }
@@ -113,8 +81,14 @@ export default function CreateAccount() {
         toast.info(
           "We sent you a verification email. Please verify to continue."
         );
-        setFeedback(undefined);
-        setVerify(response.user_id);
+        setFeedback({
+          message:
+            "We sent you a verification email. Please verify to continue.",
+          kind: "info",
+        });
+        Cookies.set("verify_temp_email", email);
+        Cookies.set("verify_temp_password", password);
+        router.push(`/verify`);
       } else {
         setFeedback({ message: response.message, kind: "error" });
       }
@@ -133,77 +107,69 @@ export default function CreateAccount() {
   return (
     <>
       <CardHeader>
-        <CardTitle className="text-3xl mx-auto">
-          {verify ? "Verify" : "Create an Account"}
-        </CardTitle>
+        <CardTitle className="text-3xl mx-auto">Create an Account</CardTitle>
       </CardHeader>
       <CardContent className="gap-3 flex flex-col">
-        {verify ? (
-          `We sent you a verification email at (${email}). Please verify to continue.`
-        ) : (
-          <>
-            <span>
-              Email
-              <Input
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="john@example.com"
-                type="email"
-              />
-            </span>
-            <span>
-              Username
-              <Input
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="john_doe"
-              />
-            </span>
-            <span>
-              Password
-              <Input
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-              />
-            </span>
-            <span>
-              Confirm Password
-              <Input
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") signup();
-                }}
-                type="password"
-              />
-            </span>
+        <span>
+          Email
+          <Input
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="john@example.com"
+            type="email"
+          />
+        </span>
+        <span>
+          Username
+          <Input
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="john_doe"
+          />
+        </span>
+        <span>
+          Password
+          <Input
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+          />
+        </span>
+        <span>
+          Confirm Password
+          <Input
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") signup();
+            }}
+            type="password"
+          />
+        </span>
 
-            <Label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={acceptTerms}
-                onChange={(e) => setAcceptTerms(e.target.checked)}
-              />
-              I agree to the{" "}
-              <Link className="underline" href="/terms">
-                terms & conditions
-              </Link>
-            </Label>
+        <Label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={acceptTerms}
+            onChange={(e) => setAcceptTerms(e.target.checked)}
+          />
+          I agree to the{" "}
+          <Link className="underline" href="/terms">
+            terms & conditions
+          </Link>
+        </Label>
 
-            {feedback && (
-              <div
-                className={`text-sm rounded-md p-2 ${
-                  feedback.kind === "error"
-                    ? "bg-red-500/20 text-red-400"
-                    : "bg-green-500/20 text-green-400"
-                }`}
-              >
-                {feedback.message}
-              </div>
-            )}
-
-            <Button onClick={signup} disabled={loading}>
-              {loading ? "Signing Up..." : "Sign Up"}
-            </Button>
-          </>
+        {feedback && (
+          <div
+            className={`text-sm rounded-md p-2 ${
+              feedback.kind === "error"
+                ? "bg-red-500/20 text-red-400"
+                : "bg-green-500/20 text-green-400"
+            }`}
+          >
+            {feedback.message}
+          </div>
         )}
+
+        <Button onClick={signup} disabled={loading}>
+          {loading ? "Signing Up..." : "Sign Up"}
+        </Button>
       </CardContent>
     </>
   );
