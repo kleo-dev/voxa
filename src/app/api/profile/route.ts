@@ -71,34 +71,33 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
-  const query_id = url.searchParams.get("id");
+  const id = url.searchParams.get("id");
+  const username = url.searchParams.get("username");
   const token = req.cookies.get("token")?.value;
 
-  if (!query_id && !token)
+  if (!token && !id && !username)
     return NextResponse.json(
-      { message: "Query arg should be token or id" },
+      { message: "Query arg should be token or id or username" },
       { status: StatusCodes.BAD_REQUEST }
     );
 
-  let user_id = query_id;
-  if (!user_id && token) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser(token);
-    user_id = user?.id ?? null;
-  }
-
-  if (!user_id)
-    return NextResponse.json(
-      { message: "Invalid token" },
-      { status: StatusCodes.BAD_REQUEST }
-    );
-
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("id, username, display_name, avatar_url, node_address")
-    .eq("id", user_id)
-    .maybeSingle();
+  const { data: profile, error } = id
+    ? await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url, node_address")
+        .eq("id", id)
+        .maybeSingle()
+    : username
+    ? await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url, node_address")
+        .eq("username", username)
+        .maybeSingle()
+    : await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url, node_address")
+        .eq("id", (await supabase.auth.getUser(token)).data.user?.id)
+        .maybeSingle();
 
   if (error)
     return NextResponse.json(

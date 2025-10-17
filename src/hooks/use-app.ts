@@ -4,6 +4,7 @@ import { useMessages } from "./use-messages";
 import { StringMap } from "@/types/typeUtils";
 import useUser, { UserProfile } from "./get-user";
 import { useClientSettings } from "./use-settings";
+import { get, Response } from "@/lib/request";
 
 export default function useApp(): App {
   const node = useRef<WebSocket | null>(null);
@@ -24,5 +25,23 @@ export default function useApp(): App {
     addMessage,
     sidebarOpen,
     setSidebarOpen,
+    getUserById: async (id: string) => {
+      if (profiles[id] !== undefined) return profiles[id];
+
+      const onResponse = (res: Response<UserProfile>) => {
+        setProfiles((prev) => {
+          prev[id] = res.data as UserProfile;
+          return prev;
+        });
+      };
+
+      try {
+        const user = await get(`/api/profile/?id=${id}`, onResponse);
+        onResponse(user);
+        return user.data;
+      } catch {
+        return null;
+      }
+    },
   };
 }

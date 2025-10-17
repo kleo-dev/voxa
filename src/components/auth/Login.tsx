@@ -18,6 +18,8 @@ export default function Login() {
   const router = useRouter();
 
   const login = async () => {
+    localStorage.removeItem("chat-messages");
+    localStorage.removeItem("server-messages");
     setFeedback(undefined);
     try {
       const res = await axios.get("/api/user", {
