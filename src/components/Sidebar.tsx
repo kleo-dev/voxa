@@ -106,9 +106,7 @@ export default function AppSidebar({
     ];
 
     setServers(updatedServers);
-    Cookies.set("servers", updatedServers.map((x) => x.join("@")).join(","), {
-      expires: 7,
-    });
+    Cookies.set("servers", updatedServers.map((x) => x.join("@")).join(","));
     setNewServer({ name: "", ip: "" });
   };
 

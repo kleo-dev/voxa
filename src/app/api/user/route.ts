@@ -5,10 +5,10 @@ import { supabase } from "../supa";
 /**
  * POST /api/user
  * Register new user
- * Body: { name, username, email, password }
+ * Body: { username, email, password }
  */
 export async function POST(req: NextRequest) {
-  const { name, username, email, password } = await req.json();
+  const { username, email, password } = await req.json();
 
   if (!email || !password || !username)
     return NextResponse.json(
@@ -28,29 +28,35 @@ export async function POST(req: NextRequest) {
       { status: StatusCodes.CONFLICT }
     );
 
-  const { data: authData, error: authError } =
-    await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { name, username },
-    });
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+  });
 
   if (authError)
     return NextResponse.json(
       { message: authError.message },
-      { status: StatusCodes.BAD_REQUEST }
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
+
+  if (!authData.user)
+    return NextResponse.json(
+      { message: "User is null" },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
     );
 
   await supabase.from("profiles").insert({
     id: authData.user.id,
-    name,
     username,
+    display_name: username,
+    avatar_url: "",
+    node_address: "",
   });
 
   return NextResponse.json({
-    message: "ok",
-    user_id: authData.user.id,
+    message: "User registered. Please check your email to verify your account.",
+    user_id: authData.user?.id,
+    email_sent: true,
   });
 }
 
@@ -61,28 +67,12 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   const params = new URL(req.url).searchParams;
-  const [username, password] = [params.get("username"), params.get("password")];
+  const [email, password] = [params.get("email"), params.get("password")];
 
-  if (!username || !password)
+  if (!email || !password)
     return NextResponse.json(
-      { message: "Params username and password are required" },
+      { message: "Params email and password are required" },
       { status: StatusCodes.BAD_REQUEST }
-    );
-
-  let email = username;
-  if (!username.includes("@")) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("email")
-      .eq("email", username)
-      .maybeSingle();
-    email = data?.email;
-  }
-
-  if (!email)
-    return NextResponse.json(
-      { message: "Invalid username" },
-      { status: StatusCodes.UNAUTHORIZED }
     );
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -104,7 +94,6 @@ export async function GET(req: NextRequest) {
     user_id: session?.user?.id,
   });
 
-  // Optionally set cookie
   res.cookies.set("token", session?.access_token ?? "", { httpOnly: true });
 
   return res;

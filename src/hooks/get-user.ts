@@ -17,12 +17,6 @@ export default function useUser() {
 
   useEffect(() => {
     async function fetchUser() {
-      const token = Cookies.get("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
       try {
         setUser((await get("/api/profile")).data);
       } catch (e: any) {
