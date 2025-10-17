@@ -37,6 +37,7 @@ import { get, Response } from "@/lib/request";
 import { cn } from "@/lib/utils";
 import App from "@/types/app";
 import { ProfileSettings } from "@/types/settings";
+import axios from "axios";
 
 export default function AppSidebar({
   children,
@@ -53,6 +54,7 @@ export default function AppSidebar({
 }>) {
   const [servers, setServers] = useState<[string, string][]>([]);
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
+  const [query, setQuery] = useState("");
   const router = useRouter();
 
   const dms = Array.from(
@@ -62,6 +64,15 @@ export default function AppSidebar({
         .filter((item) => item !== app.profile?.id) || []
     )
   );
+
+  const filteredDms = dms.filter((id) => {
+    const user = getUser(id, app.profiles, app.setProfiles);
+    const name = user?.display_name || "";
+    return (
+      name.toLowerCase().includes(query.toLowerCase()) ||
+      id.toLowerCase().includes(query.toLowerCase())
+    );
+  });
 
   useEffect(() => {
     const s = Cookies.get("servers")?.split(",");
@@ -213,12 +224,16 @@ export default function AppSidebar({
               <h2>{server.name}</h2>
             </div>
           ) : (
-            <div className="p-3 border-b flex items-center gap-2">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Find or start a conversation"
-                className="h-8"
-              />
+            <div className="p-3 border-b flex items-center">
+              <div className="relative w-full">
+                <Input
+                  placeholder="Find or start a conversation"
+                  className="pr-8 h-8"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <Search className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              </div>
             </div>
           )}
           <ScrollArea className="flex-1">
@@ -231,7 +246,7 @@ export default function AppSidebar({
                 </>
               ) : (
                 <>
-                  {dms.map((id) => (
+                  {filteredDms.map((id) => (
                     <DMItem
                       name={
                         getUser(id, app.profiles, app.setProfiles)
@@ -247,6 +262,24 @@ export default function AppSidebar({
                       app={app}
                     />
                   ))}
+                  {filteredDms.length === 0 && query.trim() !== "" ? (
+                    <div className="px-3 py-2">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start gap-2 text-sm"
+                        onClick={async () => {
+                          const response = await axios.get("/api/profile", {
+                            params: { username: query },
+                          });
+                          const user = response.data as UserProfile;
+                          router.push(`/chat/${user.id}`);
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                        Start new DM with “{query}”
+                      </Button>
+                    </div>
+                  ) : null}
                 </>
               )}
             </div>
