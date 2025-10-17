@@ -231,7 +231,11 @@ export default function MessageBox({
           <DropdownMenuContent className="">
             <EmojiPicker
               onEmojiClick={(e) => setText(text + e.emoji)}
-              theme={emoji.Theme.DARK}
+              theme={
+                app.clientSettings.theme === "dark"
+                  ? emoji.Theme.DARK
+                  : emoji.Theme.LIGHT
+              }
             />
           </DropdownMenuContent>
         </DropdownMenu>
