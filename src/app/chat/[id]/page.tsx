@@ -40,7 +40,7 @@ export default function DMs() {
             (m.from === id && m.channel_id === app.profile?.id)
         )}
         sendMessage={(message) => {
-          app.node.current?.send(
+          targetNode.current?.send(
             JSON.stringify({
               type: "send_message",
               params: {
