@@ -8,7 +8,7 @@ export default function useApp(): App {
   const node = useRef<WebSocket | null>(null);
   const [profiles, setProfiles] = useState<StringMap<UserProfile | null>>({});
   const { messages, addMessage } = useMessages();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const profile = useUser();
 
   return {

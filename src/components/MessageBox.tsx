@@ -19,6 +19,7 @@ import { UserProfile } from "@/hooks/get-user";
 import axios from "axios";
 import ProfilePicture from "./ProfilePicture";
 import App from "@/types/app";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function MessageContainer({ message, app }: { message: Message; app: App }) {
   useEffect(() => {
@@ -41,14 +42,14 @@ function MessageContainer({ message, app }: { message: Message; app: App }) {
           url={app.profiles[message.from]?.avatar_url}
           name={String(
             app.profiles[message.from]
-              ? app.profiles[message.from].display_name
+              ? app.profiles[message.from]?.display_name
               : message.from
           )}
         />
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
             {app.profiles[message.from]
-              ? app.profiles[message.from].display_name
+              ? app.profiles[message.from]?.display_name
               : message.from}
 
             <p className="text-neutral-500 text-xs">
@@ -142,13 +143,14 @@ export default function MessageBox({
   messages: Message[];
 }) {
   const [text, setText] = useState("");
+  const isMobile = useIsMobile();
 
   return (
     <div className="h-svh w-full max-h-svh flex flex-col pb-5 pl-5 gap-5">
       {channelName && (
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
           <span
-            onClick={() => app.setSidebarOpen(true)}
+            onClick={() => isMobile && app.setSidebarOpen(true)}
             className="cursor-pointer flex"
           >
             <ChevronLeftIcon className="w-5 h-5" />
