@@ -8,7 +8,7 @@ import {
   Volume2Icon,
 } from "lucide-react";
 import { Server, Channel, Message } from "@/types/types";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Cookies from "js-cookie";
 import {
   Dialog,
@@ -30,10 +30,8 @@ import { UserProfile } from "@/hooks/get-user";
 import ProfilePicture from "./ProfilePicture";
 import auth from "@/lib/auth";
 import { toast } from "sonner";
-import { StringMap } from "@/types/typeUtils";
 import SettingsDialog from "./settings/SettingsDialog";
 import Link from "next/link";
-import { get, Response } from "@/lib/request";
 import { cn } from "@/lib/utils";
 import App from "@/types/app";
 import { ProfileSettings } from "@/types/settings";
@@ -58,13 +56,15 @@ export default function AppSidebar({
   const router = useRouter();
   const [filteredDms, setFilteredDms] = useState<UserProfile[]>([]);
 
-  const dms = Array.from(
-    new Set(
-      app.messages
-        ?.flatMap((item) => [item.from, item.channel_id])
-        .filter((item) => item !== app.profile?.id) || []
-    )
-  );
+  const dms = useMemo(() => {
+    return Array.from(
+      new Set(
+        app.messages
+          ?.flatMap((item) => [item.from, item.channel_id])
+          .filter((item) => item !== app.profile?.id) || []
+      )
+    );
+  }, [app.messages, app.profile?.id]);
 
   useEffect(() => {
     const load = async () => {
@@ -79,11 +79,16 @@ export default function AppSidebar({
       );
     };
     load();
-  }, [dms]);
+  }, [dms, query]);
 
   useEffect(() => {
-    const s = Cookies.get("servers")?.split(",");
-    if (s) setServers(s.map((x) => x.trim().split("@") as [string, string]));
+    const stored = Cookies.get("servers");
+    if (!stored) return;
+    const parsed = stored
+      .split(",")
+      .map((x) => x.trim().split("@"))
+      .filter(([ip, name]) => ip && name) as [string, string][];
+    setServers(parsed);
   }, []);
 
   useEffect(() => {

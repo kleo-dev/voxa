@@ -23,35 +23,21 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Textarea } from "./ui/textarea";
 
 function MessageContainer({ message, app }: { message: Message; app: App }) {
-  useEffect(() => {
-    axios
-      .get("/api/profile/", { params: { id: message.from } })
-      .then((res) =>
-        app.setProfiles((prev) => ({
-          ...prev,
-          [message.from]: res.data as UserProfile,
-        }))
-      )
-      .catch(() => {});
-  }, [message.from]);
+  const [profile, setProfile] = useState<UserProfile | null>();
+
+  app.getUserById(message.from).then(setProfile);
 
   return (
     <div className="flex flex-col gap-3 rounded-lg p-4 hover:bg-accent">
       <div className="flex gap-2">
         {/* <div className="w-8 h-8 rounded-full bg-gray-400" /> */}
         <ProfilePicture
-          url={app.profiles[message.from]?.avatar_url}
-          name={String(
-            app.profiles[message.from]
-              ? app.profiles[message.from]?.display_name
-              : message.from
-          )}
+          url={profile?.avatar_url}
+          name={profile?.display_name || message.from}
         />
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
-            {app.profiles[message.from]
-              ? app.profiles[message.from]?.display_name
-              : message.from}
+            {profile?.display_name || message.from}
 
             <p className="text-neutral-500 text-xs">
               {isToday(message.timestamp * 1000)
