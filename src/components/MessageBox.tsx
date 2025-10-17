@@ -10,8 +10,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ChevronLeftIcon, SmilePlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronLeftIcon, SendIcon, SmilePlusIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -20,6 +20,7 @@ import axios from "axios";
 import ProfilePicture from "./ProfilePicture";
 import App from "@/types/app";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Textarea } from "./ui/textarea";
 
 function MessageContainer({ message, app }: { message: Message; app: App }) {
   useEffect(() => {
@@ -144,6 +145,7 @@ export default function MessageBox({
 }) {
   const [text, setText] = useState("");
   const isMobile = useIsMobile();
+  const inputRef = useRef<any>(null);
 
   return (
     <div className="h-svh w-full max-h-svh flex flex-col pb-5 pl-5 gap-5">
@@ -164,21 +166,64 @@ export default function MessageBox({
         ))}
       </div>
       <footer className="flex gap-3 pr-5 w-full h-max">
-        <Input
-          className=""
-          placeholder="Type a message..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              sendMessage(text);
-              setText("");
-            }
-          }}
-        />
+        {text.includes("\n") ? (
+          <Textarea
+            ref={inputRef}
+            className="resize-none"
+            placeholder="Type a message..."
+            value={text}
+            onChange={(e) => {
+              if (!e.target.value.includes("\n") && text.includes("\n")) {
+                setTimeout(() => {
+                  if (inputRef.current) {
+                    inputRef.current.selectionStart = text.length + 1;
+                    inputRef.current.selectionEnd = text.length + 1;
+                    inputRef.current.focus();
+                  }
+                }, 10);
+              }
+
+              setText(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (!e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage(text);
+                  setText("");
+                }
+              }
+            }}
+          />
+        ) : (
+          <Input
+            placeholder="Type a message..."
+            ref={inputRef}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (e.shiftKey) {
+                  setText((p) => p + "\n");
+                  setTimeout(() => {
+                    if (inputRef.current) {
+                      inputRef.current.selectionStart = text.length + 1;
+                      inputRef.current.selectionEnd = text.length + 1;
+                      inputRef.current.focus();
+                    }
+                  }, 10);
+                } else {
+                  sendMessage(text.trim());
+                  setText("");
+                }
+              }
+            }}
+          />
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary">
+            <Button variant="secondary" className="hidden md:block">
               <SmilePlusIcon />
             </Button>
           </DropdownMenuTrigger>
@@ -190,6 +235,10 @@ export default function MessageBox({
             />
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Button variant="secondary">
+          <SendIcon />
+        </Button>
       </footer>
     </div>
   );
