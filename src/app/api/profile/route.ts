@@ -19,7 +19,14 @@ export async function POST(req: NextRequest) {
       { status: StatusCodes.BAD_REQUEST }
     );
 
-  if (!username || !display_name || !avatar_url)
+  if (
+    !username ||
+    !display_name ||
+    avatar_url === undefined ||
+    avatar_url === null ||
+    node_address === undefined ||
+    node_address === null
+  )
     return NextResponse.json(
       {
         message:

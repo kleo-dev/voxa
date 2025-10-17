@@ -6,7 +6,7 @@ import useUser, { UserProfile } from "./get-user";
 
 export default function useApp(): App {
   const node = useRef<WebSocket | null>(null);
-  const [profiles, setProfiles] = useState<StringMap<UserProfile>>({});
+  const [profiles, setProfiles] = useState<StringMap<UserProfile | null>>({});
   const { messages, addMessage } = useMessages();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const profile = useUser();

@@ -36,6 +36,7 @@ import Link from "next/link";
 import { get, Response } from "@/lib/request";
 import { cn } from "@/lib/utils";
 import App from "@/types/app";
+import { ProfileSettings } from "@/types/settings";
 
 export default function AppSidebar({
   children,
@@ -201,7 +202,7 @@ export default function AppSidebar({
           </Dialog>
 
           <footer className="mt-auto">
-            <SettingsDialog />
+            <SettingsDialog profile={app.profile as ProfileSettings} />
           </footer>
         </div>
 
@@ -243,6 +244,7 @@ export default function AppSidebar({
                           ?.avatar_url || ""
                       }
                       key={id}
+                      app={app}
                     />
                   ))}
                 </>
@@ -256,6 +258,7 @@ export default function AppSidebar({
               id={app.profile?.id || "me"}
               avatar={app.profile?.avatar_url || ""}
               status="online"
+              app={app}
               settings
             />
           </footer>
@@ -283,12 +286,14 @@ function DMItem({
   avatar,
   status,
   settings,
+  app,
 }: {
   name: string;
   id: string;
   avatar: string;
   status: string;
   settings?: boolean;
+  app: App;
 }) {
   return (
     <Link
@@ -304,6 +309,7 @@ function DMItem({
         <SettingsDialog
           className="ml-auto w-7 h-7 p-0 flex items-center justify-center"
           tab="profile"
+          profile={app.profile as ProfileSettings}
         />
       )}
     </Link>
@@ -332,10 +338,12 @@ function ChannelIcon({ kind }: { kind: "text" | "voice" }) {
 
 function getUser(
   id: string,
-  userList: StringMap<UserProfile>,
-  setUserList: React.Dispatch<React.SetStateAction<StringMap<UserProfile>>>
+  userList: StringMap<UserProfile | null>,
+  setUserList: React.Dispatch<
+    React.SetStateAction<StringMap<UserProfile | null>>
+  >
 ) {
-  if (userList[id]) return userList[id];
+  if (userList[id] !== undefined) return userList[id];
 
   const onResponse = (res: Response<UserProfile>) => {
     setUserList((prev) => {
@@ -346,5 +354,10 @@ function getUser(
 
   get(`/api/profile/?id=${id}`, onResponse)
     ?.then(onResponse)
-    .catch((e) => {});
+    .catch((e) => {
+      setUserList((prev) => {
+        prev[id] = null;
+        return prev;
+      });
+    });
 }

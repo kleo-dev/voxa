@@ -9,8 +9,8 @@ export default interface App {
   node: RefObject<WebSocket | null>;
   profile: UserProfile | null;
 
-  profiles: StringMap<UserProfile>;
-  setProfiles: SetState<StringMap<UserProfile>>;
+  profiles: StringMap<UserProfile | null>;
+  setProfiles: SetState<StringMap<UserProfile | null>>;
 
   messages: Message[];
   addMessage: (v: Message) => void;
