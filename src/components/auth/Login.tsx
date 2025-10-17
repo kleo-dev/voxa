@@ -6,18 +6,10 @@ import axios from "axios";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
-import {
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { CardContent, CardHeader, CardTitle } from "../ui/card";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState<
     undefined | { kind: "error" | "info"; message: string }
@@ -29,7 +21,7 @@ export default function Login() {
     setFeedback(undefined);
     try {
       const res = await axios.get("/api/user", {
-        params: { username, password },
+        params: { email, password },
       });
 
       Cookies.set("token", (res.data as any).token);
@@ -57,7 +49,7 @@ export default function Login() {
       <CardContent className="gap-3 flex flex-col">
         <span>
           Email
-          <Input onChange={(e) => setUsername(e.target.value)} type="email" />
+          <Input onChange={(e) => setEmail(e.target.value)} type="email" />
         </span>
         <span>
           Password

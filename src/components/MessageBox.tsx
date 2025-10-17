@@ -10,8 +10,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ChevronLeftIcon, SmilePlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronLeftIcon, SendIcon, SmilePlusIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,6 +19,8 @@ import { UserProfile } from "@/hooks/get-user";
 import axios from "axios";
 import ProfilePicture from "./ProfilePicture";
 import App from "@/types/app";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Textarea } from "./ui/textarea";
 
 function MessageContainer({ message, app }: { message: Message; app: App }) {
   useEffect(() => {
@@ -41,14 +43,14 @@ function MessageContainer({ message, app }: { message: Message; app: App }) {
           url={app.profiles[message.from]?.avatar_url}
           name={String(
             app.profiles[message.from]
-              ? app.profiles[message.from].display_name
+              ? app.profiles[message.from]?.display_name
               : message.from
           )}
         />
         <div className="flex flex-col flex-1">
           <span className="font-bold flex gap-1 items-center">
             {app.profiles[message.from]
-              ? app.profiles[message.from].display_name
+              ? app.profiles[message.from]?.display_name
               : message.from}
 
             <p className="text-neutral-500 text-xs">
@@ -142,13 +144,15 @@ export default function MessageBox({
   messages: Message[];
 }) {
   const [text, setText] = useState("");
+  const isMobile = useIsMobile();
+  const inputRef = useRef<any>(null);
 
   return (
     <div className="h-svh w-full max-h-svh flex flex-col pb-5 pl-5 gap-5">
       {channelName && (
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
           <span
-            onClick={() => app.setSidebarOpen(true)}
+            onClick={() => isMobile && app.setSidebarOpen(true)}
             className="cursor-pointer flex"
           >
             <ChevronLeftIcon className="w-5 h-5" />
@@ -156,27 +160,70 @@ export default function MessageBox({
           </span>
         </header>
       )}
-      <div className="flex flex-col-reverse overflow-y-scroll">
+      <div className="mt-auto flex flex-col-reverse overflow-y-scroll">
         {messages.toReversed().map((msg) => (
           <MessageContainer key={msg.id} message={msg} app={app} />
         ))}
       </div>
-      <footer className="flex gap-3 pr-5 w-full mt-auto">
-        <Input
-          className=""
-          placeholder="Type a message..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              sendMessage(text);
-              setText("");
-            }
-          }}
-        />
+      <footer className="flex gap-3 pr-5 w-full h-max">
+        {text.includes("\n") ? (
+          <Textarea
+            ref={inputRef}
+            className="resize-none"
+            placeholder="Type a message..."
+            value={text}
+            onChange={(e) => {
+              if (!e.target.value.includes("\n") && text.includes("\n")) {
+                setTimeout(() => {
+                  if (inputRef.current) {
+                    inputRef.current.selectionStart = text.length + 1;
+                    inputRef.current.selectionEnd = text.length + 1;
+                    inputRef.current.focus();
+                  }
+                }, 10);
+              }
+
+              setText(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (!e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage(text);
+                  setText("");
+                }
+              }
+            }}
+          />
+        ) : (
+          <Input
+            placeholder="Type a message..."
+            ref={inputRef}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (e.shiftKey) {
+                  setText((p) => p + "\n");
+                  setTimeout(() => {
+                    if (inputRef.current) {
+                      inputRef.current.selectionStart = text.length + 1;
+                      inputRef.current.selectionEnd = text.length + 1;
+                      inputRef.current.focus();
+                    }
+                  }, 10);
+                } else {
+                  sendMessage(text.trim());
+                  setText("");
+                }
+              }
+            }}
+          />
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary">
+            <Button variant="secondary" className="hidden md:block">
               <SmilePlusIcon />
             </Button>
           </DropdownMenuTrigger>
@@ -184,10 +231,18 @@ export default function MessageBox({
           <DropdownMenuContent className="">
             <EmojiPicker
               onEmojiClick={(e) => setText(text + e.emoji)}
-              theme={emoji.Theme.DARK}
+              theme={
+                app.clientSettings.theme === "dark"
+                  ? emoji.Theme.DARK
+                  : emoji.Theme.LIGHT
+              }
             />
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Button variant="secondary">
+          <SendIcon />
+        </Button>
       </footer>
     </div>
   );

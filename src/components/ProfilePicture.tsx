@@ -5,7 +5,7 @@ export default function ProfilePicture({
   url,
 }: {
   name: string;
-  url: string;
+  url: string | undefined;
 }) {
   return (
     <Avatar className="h-8 w-8">

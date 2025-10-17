@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useState } from "react";
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Label } from "../ui/label";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function CreateAccount() {
   const [username, setUsername] = useState("");
@@ -20,7 +21,6 @@ export default function CreateAccount() {
   const [feedback, setFeedback] = useState<
     undefined | { kind: "error" | "info"; message: string }
   >();
-
   const router = useRouter();
 
   const validateInput = ():
@@ -36,7 +36,7 @@ export default function CreateAccount() {
       return {
         kind: "error",
         message:
-          "Username must be 3–20 characters and only letters, numbers, or underscores.",
+          "Username must be 3-20 characters and only letters, numbers, or underscores.",
       };
     }
     if (password.length < 6) {
@@ -67,11 +67,31 @@ export default function CreateAccount() {
 
     try {
       setLoading(true);
-      const res = await axios.post("/api/user", { username, password, email });
-      Cookies.set("token", (res.data as any).token);
-
-      setFeedback({ kind: "info", message: "Account created! Redirecting..." });
-      setTimeout(() => router.push("/chat"), 1000);
+      const { data } = await axios.post("/api/user", {
+        username,
+        password,
+        email,
+      });
+      const response = data as {
+        message: string;
+        email_sent: boolean;
+        user_id: string;
+      };
+      if (response.email_sent) {
+        toast.info(
+          "We sent you a verification email. Please verify to continue."
+        );
+        setFeedback({
+          message:
+            "We sent you a verification email. Please verify to continue.",
+          kind: "info",
+        });
+        Cookies.set("verify_temp_email", email);
+        Cookies.set("verify_temp_password", password);
+        router.push(`/verify`);
+      } else {
+        setFeedback({ message: response.message, kind: "error" });
+      }
     } catch (err: any) {
       setFeedback({
         kind: "error",

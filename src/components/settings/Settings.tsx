@@ -1,6 +1,5 @@
 "use client";
 
-import { useClientSettings } from "@/hooks/use-settings";
 import { setClientSettings } from "@/lib/clientSettings";
 import SettingSchema from "./SettingSchema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,19 +10,20 @@ import {
   CLIENT_SCHEMA,
   ProfileSettings,
 } from "@/types/settings";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useClientSettings } from "@/hooks/use-settings";
+import { useState } from "react";
 
 export default function Settings({
   tab,
-  profileSettings,
-  setProfileSettings,
+  profileSettings: ps,
 }: {
   tab?: string;
   profileSettings: ProfileSettings;
-  setProfileSettings: React.Dispatch<React.SetStateAction<ProfileSettings>>;
 }) {
   const [settings, setSettings] = useClientSettings();
+  const [profileSettings, setProfileSettings] = useState<ProfileSettings>(ps);
   const router = useRouter();
 
   return (

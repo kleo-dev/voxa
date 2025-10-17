@@ -3,7 +3,6 @@ import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -11,18 +10,17 @@ import {
 import { cn } from "@/lib/utils";
 import Settings from "./Settings";
 import { ProfileSettings } from "@/types/settings";
-import { useProfileSettings } from "@/hooks/use-settings";
+import { useState } from "react";
 
 export default function SettingsDialog({
   className,
   tab,
+  profile,
 }: {
   className?: string;
   tab?: string;
-  profile?: ProfileSettings;
+  profile: ProfileSettings;
 }) {
-  const [profileSettings, setProfileSettings] = useProfileSettings();
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -41,11 +39,7 @@ export default function SettingsDialog({
         </DialogHeader>
 
         <div className="w-full">
-          <Settings
-            tab={tab}
-            profileSettings={profileSettings}
-            setProfileSettings={setProfileSettings}
-          />
+          <Settings tab={tab} profileSettings={profile} />
         </div>
       </DialogContent>
     </Dialog>
