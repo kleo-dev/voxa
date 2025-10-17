@@ -21,4 +21,6 @@ export default interface App {
 
   sidebarOpen: boolean;
   setSidebarOpen: SetState<boolean>;
+
+  getUserById: (userId: string) => Promise<UserProfile | null>;
 }

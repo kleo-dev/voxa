@@ -4,10 +4,30 @@ import MessageBox from "@/components/MessageBox";
 import AppSidebar from "@/components/Sidebar";
 import { useParams } from "next/navigation";
 import useApp from "@/hooks/use-app";
+import { useEffect, useRef } from "react";
+import auth from "@/lib/auth";
 
 export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const app = useApp();
+  const targetNode = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    async function connectTargetNode() {
+      const target = await app.getUserById(id);
+      if (target) {
+        auth(
+          target.node_address,
+          targetNode,
+          () => {},
+          app.addMessage,
+          () => {}
+        );
+      }
+    }
+
+    connectTargetNode().then(() => {});
+  }, [id]);
 
   return (
     <AppSidebar app={app}>

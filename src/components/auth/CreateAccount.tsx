@@ -58,6 +58,8 @@ export default function CreateAccount() {
   };
 
   const signup = async () => {
+    localStorage.removeItem("chat-messages");
+    localStorage.removeItem("server-messages");
     setFeedback(undefined);
     const validationError = validateInput();
     if (validationError) {

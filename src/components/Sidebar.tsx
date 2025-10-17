@@ -56,6 +56,7 @@ export default function AppSidebar({
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
   const [query, setQuery] = useState("");
   const router = useRouter();
+  const [filteredDms, setFilteredDms] = useState<UserProfile[]>([]);
 
   const dms = Array.from(
     new Set(
@@ -65,14 +66,20 @@ export default function AppSidebar({
     )
   );
 
-  const filteredDms = dms.filter((id) => {
-    const user = getUser(id, app.profiles, app.setProfiles);
-    const name = user?.display_name || "";
-    return (
-      name.toLowerCase().includes(query.toLowerCase()) ||
-      id.toLowerCase().includes(query.toLowerCase())
-    );
-  });
+  useEffect(() => {
+    const load = async () => {
+      const users = await Promise.all(dms.map((id) => app.getUserById(id)));
+      setFilteredDms(
+        users.filter(
+          (user) =>
+            user !== null &&
+            (user?.username.toLowerCase().includes(query.toLowerCase()) ||
+              user?.id.toLowerCase().includes(query.toLowerCase()))
+        ) as UserProfile[]
+      );
+    };
+    load();
+  }, [dms]);
 
   useEffect(() => {
     const s = Cookies.get("servers")?.split(",");
@@ -246,19 +253,13 @@ export default function AppSidebar({
                 </>
               ) : (
                 <>
-                  {filteredDms.map((id) => (
+                  {filteredDms.map((user) => (
                     <DMItem
-                      name={
-                        getUser(id, app.profiles, app.setProfiles)
-                          ?.display_name || id
-                      }
-                      id={id}
+                      name={user.display_name}
+                      id={user.id}
                       status="online"
-                      avatar={
-                        getUser(id, app.profiles, app.setProfiles)
-                          ?.avatar_url || ""
-                      }
-                      key={id}
+                      avatar={user.avatar_url}
+                      key={user.id}
                       app={app}
                     />
                   ))}
@@ -367,30 +368,4 @@ function ChannelIcon({ kind }: { kind: "text" | "voice" }) {
     default:
       return null;
   }
-}
-
-function getUser(
-  id: string,
-  userList: StringMap<UserProfile | null>,
-  setUserList: React.Dispatch<
-    React.SetStateAction<StringMap<UserProfile | null>>
-  >
-) {
-  if (userList[id] !== undefined) return userList[id];
-
-  const onResponse = (res: Response<UserProfile>) => {
-    setUserList((prev) => {
-      prev[id] = res.data as UserProfile;
-      return prev;
-    });
-  };
-
-  get(`/api/profile/?id=${id}`, onResponse)
-    ?.then(onResponse)
-    .catch((e) => {
-      setUserList((prev) => {
-        prev[id] = null;
-        return prev;
-      });
-    });
 }
