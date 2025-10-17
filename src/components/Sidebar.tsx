@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import App from "@/types/app";
 import { ProfileSettings } from "@/types/settings";
 import axios from "axios";
+import { useIsMobile } from "@/hooks/is-mobile";
 
 export default function AppSidebar({
   children,
@@ -54,6 +55,7 @@ export default function AppSidebar({
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
   const [query, setQuery] = useState("");
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const dms = useMemo(() => {
     return Array.from(
@@ -138,7 +140,7 @@ export default function AppSidebar({
       <div
         className={cn(
           "border-r transition-all duration-300 ease-in-out overflow-hidden flex",
-          app.sidebarOpen ? "w-5xl md:w-md" : "w-0 md:w-md"
+          app.sidebarOpen && isMobile ? "w-5xl md:w-md" : "w-0 md:w-md"
         )}
       >
         <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
@@ -302,7 +304,7 @@ export default function AppSidebar({
           </footer>
         </div>
       </div>
-      {app.sidebarOpen ? (
+      {app.sidebarOpen && isMobile ? (
         <div
           className="w-full h-full overflow-x-hidden"
           onClick={() => app.setSidebarOpen(false)}

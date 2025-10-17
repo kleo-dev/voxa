@@ -6,7 +6,6 @@ import AppSidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useIsMobile } from "@/hooks/is-mobile";
 import useApp from "@/hooks/use-app";
 import { ProfileSettings } from "@/types/settings";
 import { Server } from "@/types/types";
@@ -23,7 +22,6 @@ import Link from "next/link";
 
 export default function ChatHub() {
   const app = useApp();
-  const isMobile = useIsMobile();
 
   const recentDMs = app.dms?.slice(0, 5) || [];
   // const activeServers = app.servers?.slice(0, 5) || [];
@@ -31,7 +29,7 @@ export default function ChatHub() {
 
   return (
     <AppSidebar app={app}>
-      <div className="flex-1 p-6 overflow-y-auto">
+      <div className="h-svh w-full max-h-svh flex flex-col py-5 px-5 gap-5">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -39,7 +37,7 @@ export default function ChatHub() {
           className="space-y-8"
         >
           {/* Greeting */}
-          <div onClick={() => isMobile && app.setSidebarOpen(true)}>
+          <div onClick={() => app.setSidebarOpen(true)}>
             <h1 className="text-3xl font-bold flex cursor-pointer gap-2">
               <ChevronLeft className="my-auto w-5" />
               Hey {app.profile?.display_name || "there"}
