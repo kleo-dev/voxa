@@ -54,7 +54,6 @@ export default function AppSidebar({
   const [newServer, setNewServer] = useState({ name: "", ip: "" });
   const [query, setQuery] = useState("");
   const router = useRouter();
-  const [filteredDms, setFilteredDms] = useState<UserProfile[]>([]);
 
   const dms = useMemo(() => {
     return Array.from(
@@ -69,7 +68,7 @@ export default function AppSidebar({
   useEffect(() => {
     const load = async () => {
       const users = await Promise.all(dms.map((id) => app.getUserById(id)));
-      setFilteredDms(
+      app.setDms(
         users.filter(
           (user) =>
             user !== null &&
@@ -258,7 +257,7 @@ export default function AppSidebar({
                 </>
               ) : (
                 <>
-                  {filteredDms.map((user) => (
+                  {app.dms.map((user) => (
                     <DMItem
                       name={user.display_name}
                       id={user.id}
@@ -268,7 +267,7 @@ export default function AppSidebar({
                       app={app}
                     />
                   ))}
-                  {filteredDms.length === 0 && query.trim() !== "" ? (
+                  {app.dms.length === 0 && query.trim() !== "" ? (
                     <div className="px-3 py-2">
                       <Button
                         variant="ghost"
