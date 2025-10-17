@@ -13,8 +13,11 @@ export default function useApp(): App {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const profile = useUser();
   const [clientSettings, setClientSettings] = useClientSettings();
+  const [dms, setDms] = useState<UserProfile[]>([]);
 
   return {
+    dms,
+    setDms,
     node,
     clientSettings,
     setClientSettings,

@@ -23,4 +23,7 @@ export default interface App {
   setSidebarOpen: SetState<boolean>;
 
   getUserById: (userId: string) => Promise<UserProfile | null>;
+
+  dms: UserProfile[];
+  setDms: SetState<UserProfile[]>;
 }

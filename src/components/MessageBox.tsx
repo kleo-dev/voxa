@@ -11,15 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { ChevronLeftIcon, SendIcon, SmilePlusIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { UserProfile } from "@/hooks/get-user";
-import axios from "axios";
 import ProfilePicture from "./ProfilePicture";
 import App from "@/types/app";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Textarea } from "./ui/textarea";
 
 function MessageContainer({ message, app }: { message: Message; app: App }) {
@@ -130,7 +128,6 @@ export default function MessageBox({
   messages: Message[];
 }) {
   const [text, setText] = useState("");
-  const isMobile = useIsMobile();
   const inputRef = useRef<any>(null);
 
   return (
@@ -138,7 +135,7 @@ export default function MessageBox({
       {channelName && (
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
           <span
-            onClick={() => isMobile && app.setSidebarOpen(true)}
+            onClick={() => app.setSidebarOpen(true)}
             className="cursor-pointer flex"
           >
             <ChevronLeftIcon className="w-5 h-5" />
