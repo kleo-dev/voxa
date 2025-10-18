@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { MessageCircle, Users, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Logo from "@/components/Logo";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -14,13 +15,14 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-8 py-6 border-b bg-background/60 backdrop-blur-md sticky top-0 z-50">
-        <motion.img
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-2xl font-bold"
-          src="/voxa.svg"
-        />
+        >
+          <Logo />
+        </motion.div>
         <div className="flex gap-4">
           <Button variant="ghost" onClick={() => router.push("/login")}>
             Login
