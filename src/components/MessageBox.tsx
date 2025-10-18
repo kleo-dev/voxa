@@ -120,11 +120,13 @@ export default function MessageBox({
   app,
   sendMessage,
   channelName,
+  channelIcon,
   messages,
 }: {
   app: App;
   sendMessage: (m: string) => void;
   channelName?: string;
+  channelIcon?: string;
   messages: Message[];
 }) {
   const [text, setText] = useState("");
@@ -136,10 +138,15 @@ export default function MessageBox({
         <header className="h-12 py-4 flex items-center border-b text-sm font-semibold">
           <span
             onClick={() => app.setSidebarOpen(true)}
-            className="cursor-pointer flex"
+            className="cursor-pointer flex gap-2"
           >
-            <ChevronLeftIcon className="w-5 h-5" />
-            {channelName}
+            <ChevronLeftIcon className="w-5 h-5 my-auto" />
+            <span className="flex items-center gap-1.5">
+              {channelIcon && (
+                <ProfilePicture name={channelName} url={channelIcon} className="size-7" />
+              )}
+              {channelName}
+            </span>
           </span>
         </header>
       )}

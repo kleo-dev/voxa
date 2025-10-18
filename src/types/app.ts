@@ -1,7 +1,7 @@
 import { Dispatch, RefObject, SetStateAction } from "react";
 import { StringMap } from "./typeUtils";
 import { UserProfile } from "@/hooks/get-user";
-import { Message } from "./types";
+import { Message, Server } from "./types";
 import { ClientSettings } from "./settings";
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
@@ -12,6 +12,9 @@ export default interface App {
 
   clientSettings: ClientSettings;
   setClientSettings: SetState<ClientSettings>;
+
+  servers: StringMap<Server>;
+  setServers: SetState<StringMap<Server>>;
 
   profiles: StringMap<UserProfile | null>;
   setProfiles: SetState<StringMap<UserProfile | null>>;

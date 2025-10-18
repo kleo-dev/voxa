@@ -2,7 +2,7 @@
 
 import ProfilePicture from "@/components/ProfilePicture";
 import SettingsDialog from "@/components/settings/SettingsDialog";
-import AppSidebar from "@/components/Sidebar";
+import AppLayout from "@/components/app/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -28,7 +28,7 @@ export default function ChatHub() {
   const activeServers: Server[] = [];
 
   return (
-    <AppSidebar app={app}>
+    <AppLayout app={app}>
       <div className="h-svh w-full max-h-svh flex flex-col py-5 px-5 gap-5">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -140,6 +140,6 @@ export default function ChatHub() {
           </div>
         </motion.div>
       </div>
-    </AppSidebar>
+    </AppLayout>
   );
 }

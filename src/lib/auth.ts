@@ -13,6 +13,8 @@ export default async function auth(
 ) {
   console.log("Authenticating with server id:", id);
 
+  if (!id) return;
+
   const ip = ((await get(`/api/server/${id}`)).data as any).address as string;
 
   console.log("Authenticating with server at:", ip);
