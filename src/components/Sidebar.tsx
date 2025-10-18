@@ -14,7 +14,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -37,6 +36,7 @@ import App from "@/types/app";
 import { ProfileSettings } from "@/types/settings";
 import axios from "axios";
 import { useIsMobile } from "@/hooks/is-mobile";
+import { get } from "@/lib/request";
 
 export default function AppSidebar({
   children,
@@ -51,8 +51,7 @@ export default function AppSidebar({
   server?: Server | undefined;
   app: App;
 }>) {
-  const [servers, setServers] = useState<[string, string][]>([]);
-  const [newServer, setNewServer] = useState({ name: "", ip: "" });
+  const [newServer, setNewServer] = useState("");
   const [query, setQuery] = useState("");
   const router = useRouter();
   const isMobile = useIsMobile();
@@ -82,15 +81,7 @@ export default function AppSidebar({
     load();
   }, [dms, query]);
 
-  useEffect(() => {
-    const stored = Cookies.get("servers");
-    if (!stored) return;
-    const parsed = stored
-      .split(",")
-      .map((x) => x.trim().split("@"))
-      .filter(([ip, name]) => ip && name) as [string, string][];
-    setServers(parsed);
-  }, []);
+  useEffect(() => {}, []);
 
   useEffect(() => {
     if (!app.profile?.node_address) return;
@@ -123,16 +114,20 @@ export default function AppSidebar({
     });
   }, [chatWith, app.profile]);
 
-  const handleAddServer = () => {
-    if (!newServer.ip) return;
-    const updatedServers = [
-      ...servers,
-      [newServer.ip, newServer.name] as [string, string],
-    ];
+  const handleAddServer = async () => {
+    if (!newServer || Object.hasOwn(app.servers, newServer)) return;
 
-    setServers(updatedServers);
-    Cookies.set("servers", updatedServers.map((x) => x.join("@")).join(","));
-    setNewServer({ name: "", ip: "" });
+    try {
+      const server = (await get(`/api/server/${newServer}`)).data as Server;
+      app.setServers((prev) => ({
+        ...prev,
+        [server.id]: server,
+      }));
+      Cookies.set("servers", Object.keys(app.servers).join(","));
+      setNewServer("");
+    } catch (e: any) {
+      toast.error(e);
+    }
   };
 
   return (
@@ -143,7 +138,7 @@ export default function AppSidebar({
           app.sidebarOpen && isMobile ? "w-5xl md:w-md" : "w-0 md:w-md"
         )}
       >
-        <div className="w-16 flex flex-col items-center gap-4 py-4 bg-muted border-r">
+        <div className="w-16 flex flex-col items-center gap-4 py-4 border-r">
           <Button
             onClick={() => router.push(`/chat`)}
             className="bg-transparent text-accent-foreground hover:text-accent"
@@ -151,16 +146,12 @@ export default function AppSidebar({
             <MessageCircle className="h-6 w-6" />
           </Button>
 
-          {servers.map(
-            ([ip, name]) =>
-              ip && (
-                <Button
-                  onClick={() => router.push(`/server/${ip}`)}
-                  key={ip}
-                  className="bg-transparent text-accent-foreground hover:text-accent"
-                >
-                  <HashIcon className="h-6 w-6" />
-                </Button>
+          {Object.values(app.servers).map(
+            (srv) =>
+              srv && (
+                <Link href={`/server/${srv.id}`} key={srv.id} className="">
+                  <ProfilePicture name={srv.name} url={srv.icon_url} />
+                </Link>
               )
           )}
 
@@ -173,41 +164,18 @@ export default function AppSidebar({
 
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add server</DialogTitle>
-                <DialogDescription>
-                  Add a new server to your server list.
-                </DialogDescription>
+                <DialogTitle>Join a server</DialogTitle>
               </DialogHeader>
 
               <div className="grid gap-4">
                 <div className="grid gap-3">
-                  <Label htmlFor="name-1">Name</Label>
+                  <Label htmlFor="id-1">Server ID</Label>
                   <Input
-                    id="name-1"
-                    name="name"
-                    value={newServer.name}
-                    onChange={(e) =>
-                      setNewServer((prev) => ({
-                        ...prev,
-                        name: e.target.value,
-                      }))
-                    }
-                    placeholder="Voxa Server"
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="ip-1">Server Ip</Label>
-                  <Input
-                    id="ip-1"
-                    name="ip"
-                    value={newServer.ip}
-                    onChange={(e) =>
-                      setNewServer((prev) => ({
-                        ...prev,
-                        ip: e.target.value,
-                      }))
-                    }
-                    placeholder="192.168.1.5"
+                    id="id-1"
+                    name="id"
+                    value={newServer}
+                    onChange={(e) => setNewServer(e.target.value)}
+                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                   />
                 </div>
               </div>
@@ -218,7 +186,7 @@ export default function AppSidebar({
                 </DialogClose>
                 <DialogClose asChild>
                   <Button type="button" onClick={handleAddServer}>
-                    Add server
+                    Join server
                   </Button>
                 </DialogClose>
               </DialogFooter>
@@ -231,7 +199,7 @@ export default function AppSidebar({
         </div>
 
         {/* Right column */}
-        <div className="w-full flex flex-col bg-card">
+        <div className="w-full flex flex-col bg-card/50">
           {server ? (
             <div className="p-3 border-b flex items-center gap-2">
               <h2>{server.name}</h2>

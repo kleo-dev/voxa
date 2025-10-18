@@ -1,10 +1,13 @@
 import App from "@/types/app";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMessages } from "./use-messages";
 import { StringMap } from "@/types/typeUtils";
 import useUser, { UserProfile } from "./get-user";
 import { useClientSettings } from "./use-settings";
 import { get, Response } from "@/lib/request";
+import { Server } from "@/types/types";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 export default function useApp(): App {
   const node = useRef<WebSocket | null>(null);
@@ -14,8 +17,27 @@ export default function useApp(): App {
   const profile = useUser();
   const [clientSettings, setClientSettings] = useClientSettings();
   const [dms, setDms] = useState<UserProfile[]>([]);
+  const [servers, setServers] = useState<StringMap<Server>>({});
+
+  useEffect(() => {
+    const stored = Cookies.get("servers");
+    if (!stored) return;
+    Promise.all(
+      stored
+        .split(",")
+        .map((x) => x.trim())
+        .filter((id) => id)
+        .map((id) => get(`/api/server/${id}`))
+    )
+      .then((o) =>
+        setServers(Object.fromEntries(o.map((i) => [i.data.id, i.data])))
+      )
+      .catch(toast.error);
+  }, []);
 
   return {
+    servers,
+    setServers,
     dms,
     setDms,
     node,
