@@ -6,34 +6,35 @@ import { useParams } from "next/navigation";
 import useApp from "@/hooks/use-app";
 import { useEffect, useRef } from "react";
 import auth from "@/lib/auth";
+import useAsync from "@/hooks/use-async";
 
 export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const app = useApp();
   const targetNode = useRef<WebSocket | null>(null);
+  const { value: target } = useAsync(() => app.getUserById(id));
 
   useEffect(() => {
     async function connectTargetNode() {
-      const target = await app.getUserById(id);
-      if (target) {
-        auth(
-          target.node_address,
-          targetNode,
-          () => {},
-          app.addMessage,
-          () => {}
-        );
-      }
+      if (!target) return;
+      auth(
+        target.node_address,
+        targetNode,
+        () => {},
+        app.addMessage,
+        () => {}
+      );
     }
 
-    connectTargetNode().then(() => {});
-  }, [id]);
+    connectTargetNode();
+  }, [target]);
 
   return (
     <AppSidebar app={app}>
       <MessageBox
         app={app}
-        channelName={app.profiles[id]?.display_name || id}
+        channelName={target?.display_name || id}
+        channelIcon={target?.avatar_url || "_"}
         messages={app.messages.filter(
           (m) =>
             (m.channel_id === id && m.from === app.profile?.id) ||
