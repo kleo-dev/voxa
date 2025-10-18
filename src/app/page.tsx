@@ -37,13 +37,13 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6"
+          className="text-4xl md:text-4xl font-extrabold tracking-tight mb-6"
         >
-          Chat. Connect. Collaborate.
+          Your Conversations, Your Privacy, Your Community.
         </motion.h2>
         <p className="text-lg text-muted-foreground max-w-xl mb-8">
-          A modern chat app for teams and friends. Stay connected with real-time
-          messaging, secure channels, and seamless collaboration.
+          A modern chat app for teams, communities and friends. Stay connected
+          with real-time messaging, secure channels, and seamless collaboration.
         </p>
         <div className="flex gap-3">
           <Button size="lg" onClick={() => router.push("/signup")}>
@@ -64,17 +64,17 @@ export default function LandingPage() {
         <FeatureCard
           icon={<MessageCircle className="h-10 w-10 text-primary" />}
           title="Real-Time Chat"
-          description="Experience instant messaging with typing indicators, read receipts, and more with our self-hostable node system."
+          description="Experience instant messaging with our self-hostable node / server system."
         />
         <FeatureCard
           icon={<Users className="h-10 w-10 text-primary" />}
           title="Group Channels"
-          description="Organize conversations into channels for projects, teams, or friends by hosting your own server."
+          description="Organize conversations into channels for projects, teams, or friends by hosting your own server with plugins."
         />
         <FeatureCard
           icon={<Shield className="h-10 w-10 text-primary" />}
           title="Secure & Private"
-          description="Your data is encrypted and protected, ensuring safe communication."
+          description="Your messages are managed by your chosen node server, including your own self hosted node."
         />
       </section>
 
