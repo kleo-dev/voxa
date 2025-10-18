@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
-import AppSidebar from "@/components/Sidebar";
+import AppLayout from "@/components/app/AppLayout";
 import { Server as ServerType } from "@/types/types";
 import auth from "@/lib/auth";
 import { useServerMessages } from "@/hooks/use-messages";
@@ -35,7 +35,7 @@ export default function Server() {
   );
 
   return (
-    <AppSidebar app={app} server={server}>
+    <AppLayout app={app} server={server}>
       <MessageBox
         app={app}
         channelName="General"
@@ -52,6 +52,6 @@ export default function Server() {
           );
         }}
       />
-    </AppSidebar>
+    </AppLayout>
   );
 }

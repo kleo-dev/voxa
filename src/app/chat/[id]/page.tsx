@@ -1,7 +1,7 @@
 "use client";
 
 import MessageBox from "@/components/MessageBox";
-import AppSidebar from "@/components/Sidebar";
+import AppLayout from "@/components/app/AppLayout";
 import { useParams } from "next/navigation";
 import useApp from "@/hooks/use-app";
 import { useEffect, useRef } from "react";
@@ -30,7 +30,7 @@ export default function DMs() {
   }, [target]);
 
   return (
-    <AppSidebar app={app}>
+    <AppLayout app={app}>
       <MessageBox
         app={app}
         channelName={target?.display_name || id}
@@ -52,6 +52,6 @@ export default function DMs() {
           );
         }}
       />
-    </AppSidebar>
+    </AppLayout>
   );
 }
