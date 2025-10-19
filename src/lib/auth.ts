@@ -2,6 +2,7 @@ import { Message, Server } from "@/types/types";
 import axios from "axios";
 import { Dispatch, RefObject, SetStateAction } from "react";
 import { get } from "./request";
+import { toast } from "sonner";
 
 export default async function auth(
   id: string,
@@ -22,6 +23,8 @@ export default async function auth(
     (await axios.post("/api/auth", { server_id: id })).data as any
   ).token;
 
+  var name = id;
+
   // Open the WebSocket connection
   const ws = new WebSocket(`wss://${ip}`);
   wsRef.current = ws;
@@ -34,6 +37,13 @@ export default async function auth(
     const data = JSON.parse(m.data);
     console.log("Message received:", data);
 
+    if (data.error) {
+      toast.error(`Error from ${name} (${data.error})`, {
+        description: data.message,
+      });
+      return;
+    }
+
     if (data.version) {
       setServer({ channels: [], ...data });
       ws.send(
@@ -43,6 +53,7 @@ export default async function auth(
           last_message: lastMessage || 0,
         })
       );
+      name = data.name;
       return;
     }
 
@@ -60,10 +71,28 @@ export default async function auth(
 
   ws.onerror = (err) => {
     console.error("WebSocket error:", err);
+
+    let description = "An unknown WebSocket error occurred.";
+
+    if (err instanceof ErrorEvent) {
+      // Browser WebSocket errors show up here
+      description =
+        err.message || err.error?.message || "WebSocket connection failed.";
+    } else if (err instanceof Event) {
+      // Generic Event (no info)
+      description = "WebSocket encountered a network issue.";
+    } else if (err && typeof err === "object") {
+      // Custom data if something special got passed
+      description = JSON.stringify(err, null, 2);
+    } else {
+      description = String(err);
+    }
+
+    toast.error(`WebSocket error (${name})`, { description });
   };
 
   ws.onclose = () => {
-    console.log("WebSocket closed:", ip);
+    console.log("WebSocket closed: ", ip);
   };
 
   // Cleanup on unmount or id change
