@@ -18,15 +18,15 @@ export default function useUser() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        setUser((await get("/api/profile")).data);
-      } catch (e: any) {
+        setUser((await get("/api/profile", (r) => setUser(r.data))).data);
+      } catch (e: any) {  
         router.push("/login");
         toast.error(`Error: ${e}`);
       }
     }
 
     fetchUser();
-  }, [router]);
+  }, []);
 
   return user;
 }

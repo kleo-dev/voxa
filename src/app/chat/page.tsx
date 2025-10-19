@@ -39,7 +39,7 @@ export default function ChatHub() {
           {/* Greeting */}
           <div onClick={() => app.setSidebarOpen(true)}>
             <h1 className="text-3xl font-bold flex cursor-pointer gap-2">
-              <ChevronLeft className="my-auto w-5" />
+              <ChevronLeft className="my-auto w-5 md:hidden" />
               Hey {app.profile?.display_name || "there"}
             </h1>
             <p className="text-muted-foreground">

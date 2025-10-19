@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { get } from "@/lib/request";
-import Cookies from "js-cookie";
 import { toast } from "sonner";
 import auth from "@/lib/auth";
 import { useIsMobile } from "@/hooks/is-mobile";
@@ -28,7 +26,6 @@ export default function AppLayout({
   server?: Server;
   app: App;
 }) {
-  const [query, setQuery] = useState("");
   const router = useRouter();
   const isMobile = useIsMobile();
 
@@ -80,7 +77,7 @@ export default function AppLayout({
         {server ? (
           <SidebarChannels server={server} />
         ) : (
-          <SidebarDMs app={app} query={query} setQuery={setQuery} />
+          <SidebarDMs app={app} />
         )}
       </div>
 

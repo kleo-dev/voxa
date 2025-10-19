@@ -140,10 +140,14 @@ export default function MessageBox({
             onClick={() => app.setSidebarOpen(true)}
             className="cursor-pointer flex gap-2"
           >
-            <ChevronLeftIcon className="w-5 h-5 my-auto" />
+            <ChevronLeftIcon className="w-5 h-5 my-auto md:hidden" />
             <span className="flex items-center gap-1.5">
               {channelIcon && (
-                <ProfilePicture name={channelName} url={channelIcon} className="size-7" />
+                <ProfilePicture
+                  name={channelName}
+                  url={channelIcon}
+                  className="size-7"
+                />
               )}
               {channelName}
             </span>

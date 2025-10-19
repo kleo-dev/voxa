@@ -9,38 +9,41 @@ import axios from "axios";
 import DMItem from "./DMItem";
 import App from "@/types/app";
 import { UserProfile } from "@/hooks/get-user";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function SidebarDMs({
-  app,
-  query,
-  setQuery,
-}: {
-  app: App;
-  query: string;
-  setQuery: (v: string) => void;
-}) {
+export default function SidebarDMs({ app }: { app: App }) {
   const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [dms, setDms] = useState<UserProfile[]>([]);
 
   useEffect(() => {
+    if (!app.profile) return;
+
     const load = async () => {
-      const users = await Promise.all(
-        app.messages
-          .flatMap((m) => [m.from, m.channel_id])
-          .filter((id) => id !== app.profile?.id)
-          .map((id) => app.getUserById(id))
-      );
-      app.setDms(
+      const users = [
+        ...new Set(
+          await Promise.all(
+            app.messages
+              .sort((a, b) => a.timestamp - b.timestamp)
+              .flatMap((m) => [m.from, m.channel_id])
+              .filter((id) => id !== app.profile?.id)
+              .map((id) => app.getUserById(id))
+          )
+        ),
+      ].filter((v) => !!v);
+
+      app.setDms(users);
+
+      setDms(
         users.filter(
           (user) =>
-            user &&
-            (user.username.toLowerCase().includes(query.toLowerCase()) ||
-              user.id.toLowerCase().includes(query.toLowerCase()))
-        ) as UserProfile[]
+            user?.username.toLowerCase().includes(query.toLowerCase()) ||
+            user?.display_name.toLowerCase().includes(query.toLowerCase())
+        )
       );
     };
     load();
-  }, [query]);
+  }, [query, app.messages, app.profile]);
 
   return (
     <div className="w-full flex flex-col bg-card/50">
@@ -58,7 +61,7 @@ export default function SidebarDMs({
 
       <ScrollArea className="flex-1">
         <div className="p-2 flex flex-col gap-2">
-          {app.dms.map((user) => (
+          {dms.map((user) => (
             <DMItem
               key={user.id}
               name={user.display_name}
@@ -69,7 +72,7 @@ export default function SidebarDMs({
             />
           ))}
 
-          {app.dms.length === 0 && query.trim() !== "" && (
+          {dms.length === 0 && query.trim() !== "" && (
             <div className="px-3 py-2">
               <Button
                 variant="ghost"
