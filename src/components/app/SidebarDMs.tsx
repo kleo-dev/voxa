@@ -46,7 +46,7 @@ export default function SidebarDMs({ app }: { app: App }) {
   }, [query, app.messages, app.profile]);
 
   return (
-    <div className="w-full flex flex-col bg-card/50">
+    <div className="w-full flex flex-col bg-sidebar">
       <div className="p-3 border-b flex items-center">
         <div className="relative w-full">
           <Input
