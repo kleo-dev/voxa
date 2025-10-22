@@ -76,7 +76,7 @@ export default function SidebarDMs({ app }: { app: App }) {
             <div className="px-3 py-2">
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-2 text-sm"
+                className="w-full justify-start gap-2 text-sm truncate"
                 onClick={async () => {
                   const res = await axios.get("/api/profile", {
                     params: { username: query },
@@ -92,17 +92,6 @@ export default function SidebarDMs({ app }: { app: App }) {
           )}
         </div>
       </ScrollArea>
-
-      <footer className="mt-auto pb-3 px-3">
-        <DMItem
-          name={app.profile?.display_name || "Loading.."}
-          id={app.profile?.id || "me"}
-          avatar={app.profile?.avatar_url || ""}
-          status="online"
-          app={app}
-          settings
-        />
-      </footer>
     </div>
   );
 }
