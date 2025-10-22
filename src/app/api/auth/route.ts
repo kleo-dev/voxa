@@ -102,3 +102,33 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ message: "ok", token: relayToken.key });
 }
+
+/**
+ * PUT /api/auth
+ * Called by the client to refresh the access token.
+ */
+export async function PUT(req: NextRequest) {
+  const refresh_token = req.cookies.get("refresh_token")?.value;
+
+  if (!refresh_token)
+    return NextResponse.json(
+      { message: "Missing refresh_token cookie" },
+      { status: StatusCodes.BAD_REQUEST }
+    );
+
+  const session = await supabase.auth.refreshSession({ refresh_token });
+
+  if (session.error)
+    return NextResponse.json(
+      {
+        message: session.error.message,
+      },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
+
+  return NextResponse.json({
+    message: "ok",
+    access_token: session.data.session?.access_token,
+    refresh_token: session.data.session?.refresh_token,
+  });
+}
