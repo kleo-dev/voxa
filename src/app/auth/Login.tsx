@@ -27,6 +27,7 @@ export default function Login() {
       });
 
       Cookies.set("token", (res.data as any).token);
+      Cookies.set("refresh_token", (res.data as any).refresh_token);
       setFeedback({
         kind: "info",
         message: "Login successful! Redirecting...",
