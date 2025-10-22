@@ -35,10 +35,11 @@ export default function Verify() {
       };
       if (response.verified) {
         clearInterval(i);
-        if (response.access_token) {
+        if (response.access_token && response.refresh_token) {
           setVerified(true);
           toast.info("Email verified, redirecting...");
           Cookies.set("token", response.access_token);
+          Cookies.set("refresh_token", response.refresh_token);
           Cookies.remove("verify_temp_email");
           Cookies.remove("verify_temp_password");
           setTimeout(() => router.push("/chat"), 500);
