@@ -115,6 +115,7 @@ export default function CreateAccount() {
         <span>
           Email
           <Input
+            autoComplete="email"
             onChange={(e) => setEmail(e.target.value)}
             placeholder="john@example.com"
             type="email"
@@ -123,6 +124,7 @@ export default function CreateAccount() {
         <span>
           Username
           <Input
+            autoComplete="username"
             onChange={(e) => setUsername(e.target.value)}
             placeholder="john_doe"
           />
@@ -130,6 +132,7 @@ export default function CreateAccount() {
         <span>
           Password
           <Input
+            autoComplete="new-password"
             onChange={(e) => setPassword(e.target.value)}
             type="password"
           />
@@ -137,6 +140,7 @@ export default function CreateAccount() {
         <span>
           Confirm Password
           <Input
+            autoComplete="new-password"
             onChange={(e) => setConfirmPassword(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") signup();

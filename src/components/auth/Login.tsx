@@ -51,11 +51,16 @@ export default function Login() {
       <CardContent className="gap-3 flex flex-col">
         <span>
           Email
-          <Input onChange={(e) => setEmail(e.target.value)} type="email" />
+          <Input
+            autoComplete="username"
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+          />
         </span>
         <span>
           Password
           <Input
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") login();
