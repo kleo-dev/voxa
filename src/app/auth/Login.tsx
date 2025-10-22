@@ -6,7 +6,7 @@ import axios from "axios";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Login() {
   const [email, setEmail] = useState("");
