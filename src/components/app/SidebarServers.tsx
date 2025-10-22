@@ -41,7 +41,7 @@ export default function SidebarServers({ app }: { app: App }) {
   };
 
   return (
-    <div className="w-16 flex flex-col items-center gap-4 py-4 border-r">
+    <div className="w-16 flex flex-col items-center gap-4 py-4 border-r h-full">
       <Button
         onClick={() => router.push(`/chat`)}
         className="bg-transparent text-accent-foreground hover:text-accent"
