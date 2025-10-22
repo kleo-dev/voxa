@@ -6,7 +6,7 @@ import axios from "axios";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -51,11 +51,16 @@ export default function Login() {
       <CardContent className="gap-3 flex flex-col">
         <span>
           Email
-          <Input onChange={(e) => setEmail(e.target.value)} type="email" />
+          <Input
+            autoComplete="username"
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+          />
         </span>
         <span>
           Password
           <Input
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") login();

@@ -24,10 +24,12 @@ export default function LandingPage() {
           <Logo />
         </motion.div>
         <div className="flex gap-4">
-          <Button variant="ghost" onClick={() => router.push("/login")}>
+          <Button variant="ghost" onClick={() => router.push("/auth?t=login")}>
             Login
           </Button>
-          <Button onClick={() => router.push("/signup")}>Get Started</Button>
+          <Button onClick={() => router.push("/auth?t=create")}>
+            Get Started
+          </Button>
         </div>
       </header>
 
@@ -46,7 +48,7 @@ export default function LandingPage() {
           with real-time messaging, secure channels, and seamless collaboration.
         </p>
         <div className="flex gap-3">
-          <Button size="lg" onClick={() => router.push("/signup")}>
+          <Button size="lg" onClick={() => router.push("/auth?t=create")}>
             Get Started
           </Button>
           <Button

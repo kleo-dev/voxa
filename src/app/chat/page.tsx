@@ -19,6 +19,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import StartNewDM from "./StartNewDM";
 
 export default function ChatHub() {
   const app = useApp();
@@ -122,10 +123,7 @@ export default function ChatHub() {
           <div>
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="flex flex-wrap gap-3">
-              <Button variant="outline" className="gap-2">
-                <PlusCircle className="w-4 h-4" />
-                Start New DM
-              </Button>
+              <StartNewDM />
               <Button variant="outline" className="gap-2">
                 <Users className="w-4 h-4" />
                 Create Server

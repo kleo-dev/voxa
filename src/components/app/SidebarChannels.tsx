@@ -26,7 +26,7 @@ export function ChannelItem({ channel }: { channel: Channel }) {
 
 export default function SidebarChannels({ server }: { server: Server }) {
   return (
-    <div className="w-full flex flex-col bg-card/50">
+    <div className="w-full flex flex-col bg-sidebar">
       <div className="p-3 border-b flex items-center gap-2">
         <h2>{server.name}</h2>
       </div>

@@ -19,8 +19,8 @@ export default function useUser() {
     async function fetchUser() {
       try {
         setUser((await get("/api/profile", (r) => setUser(r.data))).data);
-      } catch (e: any) {  
-        router.push("/login");
+      } catch (e: any) {
+        router.push("/auth?t=login");
         toast.error(`Error: ${e}`);
       }
     }

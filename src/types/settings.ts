@@ -4,7 +4,7 @@ import {
 } from "@/components/settings/SettingSchema";
 
 export interface ClientSettings {
-  theme: "light" | "dark";
+  theme: "light" | "dark" | "black";
 }
 
 export interface ProfileSettings {
@@ -15,7 +15,7 @@ export interface ProfileSettings {
 }
 
 export const CLIENT_SCHEMA: SettingsSchema = {
-  theme: ["light", "dark"],
+  theme: ["light", "dark", "black"],
 };
 
 export const PROFILE_SCHEMA: SettingsSchema = {

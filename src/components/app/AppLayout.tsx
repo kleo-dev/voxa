@@ -12,6 +12,7 @@ import { Server, Message } from "@/types/types";
 import SidebarServers from "./SidebarServers";
 import SidebarDMs from "./SidebarDMs";
 import SidebarChannels from "./SidebarChannels";
+import DMItem from "./DMItem";
 
 export default function AppLayout({
   children,
@@ -70,15 +71,30 @@ export default function AppLayout({
           app.sidebarOpen && isMobile ? "w-5xl md:w-md" : "w-0 md:w-md"
         )}
       >
-        {/* Left column — servers */}
-        <SidebarServers app={app} />
+        <div className="flex-shrink-0">
+          <SidebarServers app={app} />
+        </div>
 
-        {/* Right column — DMs or server channels */}
-        {server ? (
-          <SidebarChannels server={server} />
-        ) : (
-          <SidebarDMs app={app} />
-        )}
+        <div className="flex-1 min-w-0 flex flex-col bg-sidebar">
+          <div className="flex-1 min-h-0">
+            {server ? (
+              <SidebarChannels server={server} />
+            ) : (
+              <SidebarDMs app={app} />
+            )}
+          </div>
+
+          <footer className="mt-auto pb-3 px-3">
+            <DMItem
+              name={app.profile?.display_name || "Loading.."}
+              id={app.profile?.id || "me"}
+              avatar={app.profile?.avatar_url || ""}
+              status="online"
+              app={app}
+              settings
+            />
+          </footer>
+        </div>
       </div>
 
       {app.sidebarOpen && isMobile ? (
