@@ -1,12 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { MessageCircle, Users, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
+import Shine from "./Shine";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -80,62 +78,21 @@ export default function LandingPage() {
         />
       </section> */}
 
-      <section className="w-full">
-        <div className="w-3xl h-1 mx-auto relative">
-          <div className="ss-light2 absolute left-1/2 -translate-x-1/2 w-[760px] h-[29px] rounded-full"></div>
-          <div className="ss-light3 absolute left-1/2 -translate-x-1/2 w-[491px] h-[17px] rounded-full"></div>
-          <div className="ss-light4 absolute left-1/2 -translate-x-1/2 w-[467px] h-[17px] rounded-full"></div>
-          <div className="ss-light5 absolute left-1/2 -translate-x-1/2 w-[334px] h-[5px] rounded-full"></div>
-          <div className="ss-light6 absolute left-1/2 -translate-x-1/2 w-[760px] h-[2px] rounded-full"></div>
-          <div className="ss-light7 absolute left-1/2 -translate-x-1/2 w-[768px] h-[398px] rounded-full"></div>
-        </div>
+      {/* Showcase */}
+      <section className="w-full lg:w-6xl mx-auto px-8 pb-10">
+        <Shine />
 
-        {/* <img src="/ss.png" alt="Showcase" className="max-w-6xl mx-auto" /> */}
         <img
           src="/ss.png"
           alt="Showcase"
-          className="max-w-6xl mx-auto relative z-10"
+          className="w-full mx-auto relative z-10 border border-accent rounded-lg"
         />
       </section>
-
-      {/* Call to Action */}
-      {/* <section className="bg-muted py-20 px-6 text-center">
-        <h3 className="text-3xl font-semibold mb-4">
-          Ready to start chatting?
-        </h3>
-        <p className="text-muted-foreground mb-6">
-          Create your free account today and bring your conversations together.
-        </p>
-        <div className="max-w-md mx-auto flex gap-2">
-          <Input placeholder="Enter your email" />
-          <Button>Sign Up</Button>
-        </div>
-      </section> */}
 
       {/* Footer */}
       <footer className="px-6 py-8 border-t text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} Voxa. All rights reserved.
       </footer>
     </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <Card className="shadow-sm">
-      <CardContent className="p-6 flex flex-col items-center text-center">
-        {icon}
-        <h4 className="mt-4 font-semibold text-xl">{title}</h4>
-        <p className="mt-2 text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
   );
 }
