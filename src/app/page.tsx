@@ -1,12 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { MessageCircle, Users, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
+import Shine from "./Shine";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -62,7 +60,7 @@ export default function LandingPage() {
       </main>
 
       {/* Features */}
-      <section className="grid md:grid-cols-3 gap-6 px-6 py-16 max-w-6xl mx-auto">
+      {/* <section className="grid md:grid-cols-3 gap-6 px-6 py-16 max-w-6xl mx-auto">
         <FeatureCard
           icon={<MessageCircle className="h-10 w-10 text-primary" />}
           title="Real-Time Chat"
@@ -78,46 +76,28 @@ export default function LandingPage() {
           title="Secure & Private"
           description="Your messages are managed by your chosen node server, including your own self hosted node."
         />
-      </section>
-
-      {/* Call to Action */}
-      {/* <section className="bg-muted py-20 px-6 text-center">
-        <h3 className="text-3xl font-semibold mb-4">
-          Ready to start chatting?
-        </h3>
-        <p className="text-muted-foreground mb-6">
-          Create your free account today and bring your conversations together.
-        </p>
-        <div className="max-w-md mx-auto flex gap-2">
-          <Input placeholder="Enter your email" />
-          <Button>Sign Up</Button>
-        </div>
       </section> */}
+
+      {/* Showcase */}
+      <motion.section
+        className="w-full lg:w-6xl mx-auto px-8 pb-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Shine />
+
+        <img
+          src="/ss.png"
+          alt="Showcase"
+          className="w-full mx-auto relative border border-accent rounded-lg"
+        />
+      </motion.section>
 
       {/* Footer */}
       <footer className="px-6 py-8 border-t text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} Voxa. All rights reserved.
       </footer>
     </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <Card className="shadow-sm">
-      <CardContent className="p-6 flex flex-col items-center text-center">
-        {icon}
-        <h4 className="mt-4 font-semibold text-xl">{title}</h4>
-        <p className="mt-2 text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
   );
 }

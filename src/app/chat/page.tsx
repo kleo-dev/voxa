@@ -120,8 +120,8 @@ export default function ChatHub() {
           <Separator />
 
           {/* Quick Actions */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+          <div className="w-full h-full flex items-center justify-center">
+            {/* <h2 className="text-xl font-semibold mb-4">Quick Actions</h2> */}
             <div className="flex flex-wrap gap-3">
               <StartNewDM />
               <Button variant="outline" className="gap-2">

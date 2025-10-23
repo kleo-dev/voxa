@@ -234,7 +234,13 @@ export default function MessageBox({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="secondary">
+        <Button
+          variant="secondary"
+          onClick={() => {
+            sendMessage(text.trim());
+            setText("");
+          }}
+        >
           <SendIcon />
         </Button>
       </footer>
