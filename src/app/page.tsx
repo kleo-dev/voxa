@@ -79,15 +79,20 @@ export default function LandingPage() {
       </section> */}
 
       {/* Showcase */}
-      <section className="w-full lg:w-6xl mx-auto px-8 pb-10">
+      <motion.section
+        className="w-full lg:w-6xl mx-auto px-8 pb-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <Shine />
 
         <img
           src="/ss.png"
           alt="Showcase"
-          className="w-full mx-auto relative z-10 border border-accent rounded-lg"
+          className="w-full mx-auto relative border border-accent rounded-lg"
         />
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <footer className="px-6 py-8 border-t text-center text-sm text-muted-foreground">
