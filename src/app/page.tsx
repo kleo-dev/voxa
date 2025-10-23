@@ -62,7 +62,7 @@ export default function LandingPage() {
       </main>
 
       {/* Features */}
-      <section className="grid md:grid-cols-3 gap-6 px-6 py-16 max-w-6xl mx-auto">
+      {/* <section className="grid md:grid-cols-3 gap-6 px-6 py-16 max-w-6xl mx-auto">
         <FeatureCard
           icon={<MessageCircle className="h-10 w-10 text-primary" />}
           title="Real-Time Chat"
@@ -77,6 +77,24 @@ export default function LandingPage() {
           icon={<Shield className="h-10 w-10 text-primary" />}
           title="Secure & Private"
           description="Your messages are managed by your chosen node server, including your own self hosted node."
+        />
+      </section> */}
+
+      <section className="w-full">
+        <div className="w-3xl h-1 mx-auto relative">
+          <div className="ss-light2 absolute left-1/2 -translate-x-1/2 w-[760px] h-[29px] rounded-full"></div>
+          <div className="ss-light3 absolute left-1/2 -translate-x-1/2 w-[491px] h-[17px] rounded-full"></div>
+          <div className="ss-light4 absolute left-1/2 -translate-x-1/2 w-[467px] h-[17px] rounded-full"></div>
+          <div className="ss-light5 absolute left-1/2 -translate-x-1/2 w-[334px] h-[5px] rounded-full"></div>
+          <div className="ss-light6 absolute left-1/2 -translate-x-1/2 w-[760px] h-[2px] rounded-full"></div>
+          <div className="ss-light7 absolute left-1/2 -translate-x-1/2 w-[768px] h-[398px] rounded-full"></div>
+        </div>
+
+        {/* <img src="/ss.png" alt="Showcase" className="max-w-6xl mx-auto" /> */}
+        <img
+          src="/ss.png"
+          alt="Showcase"
+          className="max-w-6xl mx-auto relative z-10"
         />
       </section>
 
