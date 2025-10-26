@@ -41,7 +41,7 @@ export default function SidebarServers({ app }: { app: App }) {
   };
 
   return (
-    <div className="w-16 flex flex-col items-center gap-4 py-4 border-r h-full">
+    <div className="w-16 flex flex-col items-center gap-4 py-4 border-r h-full overflow-y-scroll no-scrollbar">
       <Button
         onClick={() => router.push(`/chat`)}
         className="bg-transparent text-accent-foreground hover:text-accent"
@@ -50,9 +50,9 @@ export default function SidebarServers({ app }: { app: App }) {
       </Button>
 
       {Object.values(app.servers).map(
-        (srv) =>
+        (srv, i) =>
           srv && (
-            <Link href={`/server/${srv.id}`} key={srv.id}>
+            <Link href={`/server/${srv.id}`} key={i}>
               <ProfilePicture name={srv.name} url={srv.icon_url} />
             </Link>
           )

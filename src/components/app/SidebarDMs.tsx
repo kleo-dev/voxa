@@ -20,17 +20,18 @@ export default function SidebarDMs({ app }: { app: App }) {
     if (!app.profile) return;
 
     const load = async () => {
-      const users = [
-        ...new Set(
-          await Promise.all(
-            app.messages
-              .sort((a, b) => a.timestamp - b.timestamp)
-              .flatMap((m) => [m.from, m.channel_id])
-              .filter((id) => id !== app.profile?.id)
-              .map((id) => app.getUserById(id))
-          )
-        ),
-      ].filter((v) => !!v);
+      const users = (
+        await Promise.all(
+          [
+            ...new Set(
+              app.messages
+                .sort((a, b) => a.timestamp - b.timestamp)
+                .flatMap((m) => [m.from, m.channel_id])
+                .filter((id) => id !== app.profile?.id)
+            ),
+          ].map((id) => app.getUserById(id))
+        )
+      ).filter((v) => !!v);
 
       app.setDms(users);
 
