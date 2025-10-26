@@ -13,32 +13,46 @@ import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
-  MessageCircle,
   Users,
   Settings,
-  PlusCircle,
+  TrendingUp,
+  NetworkIcon,
+  MessagesSquare,
 } from "lucide-react";
 import Link from "next/link";
 import StartNewDM from "./StartNewDM";
 import AsyncValue from "@/components/AsyncValue";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 export default function ChatHub() {
+  const router = useRouter();
+
   const app = useApp();
-
-  const recentDMs = app.dms?.slice(0, 5) || [];
-  const activeServers: Server[] = Object.values(app.servers).slice(0, 5) || [];
-  const suggestedServers: Server[] = [
-    { id: "1", name: "Frontend Devs", icon_url: "", channels: [] },
-    { id: "2", name: "Gamers Lounge", icon_url: "", channels: [] },
-    { id: "3", name: "Music Hub", icon_url: "", channels: [] },
+  const recentPeople = app.dms.slice(0, 3);
+  const activeServers: Server[] = Object.values(app.servers).slice(0, 3);
+  const trendingServers: Server[] = [
+    {
+      id: "cee6b20f-7e6a-4071-8df1-aab37f52bbb9",
+      name: "ORUS",
+      icon_url: "https://github.com/orus-dev.png",
+      channels: [],
+    },
+    {
+      id: "cee6b20f-7e6a-4071-8df1-aab37f52bbb9",
+      name: "Saturn Client",
+      icon_url: "https://github.com/saturnclientmc.png",
+      channels: [],
+    },
+    {
+      id: "cee6b20f-7e6a-4071-8df1-aab37f52bbb9",
+      name: "OSUI Rust Hub",
+      icon_url: "https://github.com/osui-rs.png",
+      channels: [],
+    },
   ];
-  const recentActivity = app.messages.slice(0, 5);
-
-  const stats = {
-    dms: app.dms?.length || 0,
-    servers: app.servers?.length || 0,
-    // friends: app.friends?.length || 0,
-  };
+  const recentActivity = app.messages.slice(0, 3);
 
   return (
     <AppLayout app={app}>
@@ -56,7 +70,7 @@ export default function ChatHub() {
               Hey {app.profile?.display_name || "there"}!
             </h1>
             <p className="text-muted-foreground">
-              Here’s what’s happening in your network today.
+              Here's what's happening in your network today.
             </p>
           </div>
 
@@ -66,13 +80,13 @@ export default function ChatHub() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5" />
-                  Recent DMs
+                  <Users className="w-5 h-5" />
+                  Recently chatted with
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {recentDMs.length ? (
-                  recentDMs.map((dm) => (
+                {recentPeople.length ? (
+                  recentPeople.map((dm) => (
                     <Link
                       href={`/chat/${dm.id}`}
                       key={dm.id}
@@ -102,7 +116,7 @@ export default function ChatHub() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+                  <NetworkIcon className="w-5 h-5" />
                   Active Servers
                 </CardTitle>
               </CardHeader>
@@ -137,7 +151,7 @@ export default function ChatHub() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" />
+                <MessagesSquare className="w-5 h-5" />
                 Recent Activity
               </CardTitle>
             </CardHeader>
@@ -184,26 +198,43 @@ export default function ChatHub() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Discover Servers
+                <TrendingUp className="w-5 h-5" />
+                Trending Servers
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {suggestedServers.map((srv) => (
+                {trendingServers.map((srv) => (
                   <motion.div
                     key={srv.id}
                     whileHover={{ scale: 1.03 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <Card className="hover:bg-accent transition">
+                    <Card
+                      className="hover:bg-accent transition"
+                      onClick={async () => {
+                        try {
+                          Cookies.set(
+                            "servers",
+                            Object.keys({
+                              ...app.servers,
+                              [srv.id]: srv,
+                            }).join(",")
+                          );
+
+                          app.setServers((prev) => ({
+                            ...prev,
+                            [srv.id]: srv,
+                          }));
+                          router.push(`/server/${srv.id}`);
+                        } catch (e: any) {
+                          toast.error(e);
+                        }
+                      }}
+                    >
                       <CardContent className="p-4 flex flex-col items-center text-center gap-2">
                         <ProfilePicture name={srv.name} url={srv.icon_url} />
                         <h3 className="font-medium truncate">{srv.name}</h3>
-                        <Button size="sm" className="gap-2">
-                          <PlusCircle className="w-4 h-4" />
-                          Join
-                        </Button>
                       </CardContent>
                     </Card>
                   </motion.div>
