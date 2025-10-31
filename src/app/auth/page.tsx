@@ -12,19 +12,19 @@ export default function Auth() {
   const tab = pt === "create" || pt === "login" ? pt : "create";
 
   return (
-    <div className="h-screen flex items-center">
+    <div className="h-svh w-svw flex items-center">
       <Tabs defaultValue={tab} className="mx-auto">
         <TabsList className="mx-auto">
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="create">Create Account</TabsTrigger>
         </TabsList>
-        <TabsContent value="login">
-          <Card className="w-md">
+        <TabsContent value="login" className="w-svw p-5 md:p-0 md:w-max">
+          <Card className="w-full md:w-md">
             <Login />
           </Card>
         </TabsContent>
-        <TabsContent value="create">
-          <Card className="w-md">
+        <TabsContent value="create" className="w-svw p-5 md:p-0 md:w-max">
+          <Card className="w-full md:w-md">
             <CreateAccount />
           </Card>
         </TabsContent>
