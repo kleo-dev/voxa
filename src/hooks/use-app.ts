@@ -5,7 +5,7 @@ import { StringMap } from "@/types/typeUtils";
 import useUser, { UserProfile } from "./get-user";
 import { useClientSettings } from "./use-settings";
 import { get, Response } from "@/lib/request";
-import { Server } from "@/types/types";
+import { Channel, Server } from "@/types/types";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 
@@ -18,6 +18,7 @@ export default function useApp(): App {
   const [clientSettings, setClientSettings] = useClientSettings();
   const [dms, setDms] = useState<UserProfile[]>([]);
   const [servers, setServers] = useState<StringMap<Server>>({});
+  const [currentChannel, setCurrentChannel] = useState<Channel | null>(null);
 
   useEffect(() => {
     const stored = Cookies.get("servers");
@@ -36,6 +37,8 @@ export default function useApp(): App {
   }, []);
 
   return {
+    currentChannel,
+    setCurrentChannel,
     servers,
     setServers,
     dms,

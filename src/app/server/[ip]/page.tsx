@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import MessageBox from "@/components/MessageBox";
 import AppLayout from "@/components/app/AppLayout";
 import { Server as ServerType } from "@/types/types";
@@ -12,6 +12,7 @@ import { useEffectOnceWhenReady } from "@/hooks/use-once";
 
 export default function Server() {
   const { ip } = useParams<{ ip: string }>();
+  const searchParams = useSearchParams();
   const serverRef = useRef<WebSocket | null>(null);
   const [server, setServer] = useState<undefined | ServerType>();
   const app = useApp();
@@ -31,27 +32,48 @@ export default function Server() {
       );
     },
     [ip, messages],
-    [undefined, (v) => v[ip]]
+    [undefined, (v) => v]
   );
+
+  useEffect(() => {
+    const channelId = searchParams.get("ch");
+    if (channelId) {
+      app.setCurrentChannel(
+        server?.channels.find((v) => v.id === channelId) ||
+          server?.channels[0] ||
+          null
+      );
+    } else {
+      app.setCurrentChannel(server?.channels[0] || null);
+    }
+  }, [server]);
 
   return (
     <AppLayout app={app} server={server}>
-      <MessageBox
-        app={app}
-        channelName="General"
-        messages={messages[ip]?.filter((m) => m.channel_id === "general") || []}
-        sendMessage={(message) => {
-          serverRef.current?.send(
-            JSON.stringify({
-              type: "send_message",
-              params: {
-                channel_id: "general",
-                contents: message,
-              },
-            })
-          );
-        }}
-      />
+      {app.currentChannel ? (
+        <MessageBox
+          app={app}
+          channelName={app.currentChannel.name}
+          messages={
+            messages[ip]?.filter(
+              (m) => m.channel_id === app.currentChannel?.id
+            ) || []
+          }
+          sendMessage={(message) => {
+            serverRef.current?.send(
+              JSON.stringify({
+                type: "send_message",
+                params: {
+                  channel_id: app.currentChannel?.id,
+                  contents: message,
+                },
+              })
+            );
+          }}
+        />
+      ) : (
+        <div className="h-svh w-full max-h-svh flex flex-col pb-5 pl-5 gap-5"></div>
+      )}
     </AppLayout>
   );
 }
