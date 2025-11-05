@@ -34,7 +34,7 @@ export default function ChatHub() {
   const activeServers: Server[] = Object.values(app.servers).slice(0, 3);
   const trendingServers: Server[] = [
     {
-      id: "cee6b20f-7e6a-4071-8df1-aab37f52bbb9",
+      id: "orus",
       name: "ORUS",
       icon_url: "https://github.com/orus-dev.png",
       channels: [],
@@ -46,7 +46,7 @@ export default function ChatHub() {
       channels: [],
     },
     {
-      id: "cee6b20f-7e6a-4071-8df1-aab37f52bbb9",
+      id: "osui",
       name: "OSUI Rust Hub",
       icon_url: "https://github.com/osui-rs.png",
       channels: [],

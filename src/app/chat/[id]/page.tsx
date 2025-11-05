@@ -2,17 +2,19 @@
 
 import MessageBox from "@/components/MessageBox";
 import AppLayout from "@/components/app/AppLayout";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import useApp from "@/hooks/use-app";
 import { useEffect, useRef } from "react";
 import auth from "@/lib/auth";
 import useAsync from "@/hooks/use-async";
+import { Button } from "@/components/ui/button";
 
 export default function DMs() {
   const { id } = useParams<{ id: string }>();
   const app = useApp();
   const targetNode = useRef<WebSocket | null>(null);
-  const { value: target } = useAsync(() => app.getUserById(id));
+  const { value: target, loading } = useAsync(() => app.getUserById(id));
+  const router = useRouter();
 
   useEffect(() => {
     async function connectTargetNode() {
@@ -29,7 +31,7 @@ export default function DMs() {
     connectTargetNode();
   }, [target]);
 
-  return (
+  return loading || target ? (
     <AppLayout app={app}>
       <MessageBox
         app={app}
@@ -53,5 +55,20 @@ export default function DMs() {
         }}
       />
     </AppLayout>
+  ) : (
+    <div className="flex min-h-screen flex-col items-center justify-center text-center">
+      <h1 className="text-9xl font-extrabold text-gray-500 tracking-widest">
+        404
+      </h1>
+      <div className="border border-border text-white px-2 text-sm rounded rotate-12 absolute backdrop-blur-sm">
+        User Not Found
+      </div>
+      <p className="mt-5 text-gray-600">
+        Sorry, we couldn't find the user you're looking for.
+      </p>
+      <Button className="mt-4" onClick={() => router.push("/chat")}>
+        Go home
+      </Button>
+    </div>
   );
 }
